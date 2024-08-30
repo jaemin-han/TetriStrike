@@ -9,15 +9,19 @@
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Projects.h"
+#include "SNegativeActionButton.h"
 #include "Animation/AnimInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values for this component's properties
 UTP_WeaponComponent::UTP_WeaponComponent()
 {
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 
@@ -27,7 +31,6 @@ void UTP_WeaponComponent::Fire()
 	{
 		return;
 	}
-
 	// Try and fire a projectile
 	if (ProjectileClass != nullptr)
 	{
@@ -35,19 +38,34 @@ void UTP_WeaponComponent::Fire()
 		if (World != nullptr)
 		{
 			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
+			//const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
 			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
 			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+
+			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
+			//const FVector SpawnLocation = Character->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
 	
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	
+			//ActorSpawnParams.Owner = Character;
+			
 			// Spawn the projectile at the muzzle
-			World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			if(Projectile)
+			{
+				Projectile->SetDamage(BulletDamage);
+				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
+				Projectile->SetActorRotation(SpawnRotation);
+				//Projectile->GetProjectileMovement()->bRotationFollowsVelocity = true;
+			}
+			bIncreaseStart = false;
+
 		}
 	}
-	
+	BulletDamage = 1.0f;
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
 	{
@@ -95,12 +113,25 @@ bool UTP_WeaponComponent::AttachWeapon(ATetriStrikeCharacter* TargetCharacter)
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			// Fire
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
+			//EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
+
+			//EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::OnFireTriggered);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::OnFireOngoing);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &UTP_WeaponComponent::Fire);
+
+			
 		}
 	}
 
 	return true;
 }
+
+void UTP_WeaponComponent::OnFireOngoing()
+{
+	bIncreaseStart = true;
+}
+
+
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
@@ -116,4 +147,25 @@ void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			Subsystem->RemoveMappingContext(FireMappingContext);
 		}
 	}
+}
+
+void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if(bIncreaseStart)
+	{
+		if(BulletDamage < 100)
+		{
+			BulletDamage += 50.0f * DeltaTime;
+		}
+		else
+		{
+			BulletDamage = 100.0f;
+		}
+	}
+	else
+	{
+		BulletDamage = 1.0f * DeltaTime;
+	}
+
 }
