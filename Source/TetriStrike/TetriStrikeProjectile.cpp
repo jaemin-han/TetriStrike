@@ -1,6 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TetriStrikeProjectile.h"
+
+#include "BlendSpaceAnalysis.h"
+#include "TetriStrikeCharacter.h"
+#include "TP_WeaponComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -30,14 +34,49 @@ ATetriStrikeProjectile::ATetriStrikeProjectile()
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 }
+void ATetriStrikeProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	CalculateVelocity();
+}
 
+void ATetriStrikeProjectile::CalculateVelocity()
+{
+	FVector ForwardVector = GetActorForwardVector();
+
+	float CalculatedSpeed = Damage * VelocityMultiplier + VelocityMinimum;
+	FVector Velocity = ForwardVector * CalculatedSpeed;
+	
+	ProjectileMovement->Velocity = Velocity;
+	ProjectileMovement->InitialSpeed = CalculatedSpeed;
+	ProjectileMovement->MaxSpeed = CalculatedSpeed;
+
+	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
+	UE_LOG(LogTemp, Warning, TEXT("Velocity: %s"), *Velocity.ToString());
+}
 void ATetriStrikeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		FVector CurrentVelocity = GetVelocity();
+		int32 ReverseMaker = 1;
+		
+		FVector Impulse = CurrentVelocity * ImpulseMultiplier * ReverseMaker;
 
+		Impulse.Z = FMath::Clamp(Impulse.Z, -1000000.0f, 0.0f);
+		OtherComp->AddImpulseAtLocation(Impulse, GetActorLocation());
 		Destroy();
 	}
+	
 }
+
+void ATetriStrikeProjectile::SetDamage(float DamageAmount)
+{
+	Damage = DamageAmount;
+	CalculateVelocity();
+	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
+
+}
+
