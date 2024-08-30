@@ -43,17 +43,30 @@ void ATetriStrikeProjectile::BeginPlay()
 
 void ATetriStrikeProjectile::CalculateVelocity()
 {
-	FVector ForwardVector = GetActorForwardVector();
-
-	float CalculatedSpeed = Damage * VelocityMultiplier + VelocityMinimum;
-	FVector Velocity = ForwardVector * CalculatedSpeed;
+	/*
+	if(!GetOwner())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Owner is null"));
+		return;
+	}
+	*/
 	
+	UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), Damage);
+	//FVector ForwardVector = GetOwner()->GetActorForwardVector();
+	FVector ForwardVector = GetActorForwardVector();
+	float CalculatedSpeed = Damage * 150 + 300;
+	if(CalculatedSpeed < 0.0f)
+	{
+		CalculatedSpeed = 0.0f;
+	}
+	FVector Velocity = ForwardVector * CalculatedSpeed;
+	//ProjectileMovement->SetVelocityInLocalSpace(Velocity);
+
 	ProjectileMovement->Velocity = Velocity;
 	ProjectileMovement->InitialSpeed = CalculatedSpeed;
 	ProjectileMovement->MaxSpeed = CalculatedSpeed;
 
-	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
-	UE_LOG(LogTemp, Warning, TEXT("Velocity: %s"), *Velocity.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("CalculatedSpeed: %f, Velocity: %s"), CalculatedSpeed, *Velocity.ToString());
 }
 void ATetriStrikeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -65,7 +78,7 @@ void ATetriStrikeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 		
 		FVector Impulse = CurrentVelocity * ImpulseMultiplier * ReverseMaker;
 
-		Impulse.Z = FMath::Clamp(Impulse.Z, -1000000.0f, 0.0f);
+		//Impulse.Z = FMath::Clamp(Impulse.Z, -1000000.0f, 0.0f);
 		OtherComp->AddImpulseAtLocation(Impulse, GetActorLocation());
 		Destroy();
 	}
