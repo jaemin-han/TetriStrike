@@ -42,6 +42,14 @@ void ATetriStrikeCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	SetFlyingMode();
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	if (MovementComponent)
+	{
+		MovementComponent->MaxFlySpeed = 1200.0f;
+		MovementComponent->BrakingDecelerationFlying = 7000.0f;
+		//MovementComponent->SetMovementMode(MOVE_Flying);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -67,17 +75,28 @@ void ATetriStrikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	}
 }
 
+void ATetriStrikeCharacter::SetFlyingMode()
+{
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	}
+}
+
 
 void ATetriStrikeCharacter::Move(const FInputActionValue& Value)
 {
+	FVector MovementVector = Value.Get<FVector>();
+
 	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	//FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
+		AddMovementInput(GetActorUpVector(), MovementVector.Z);
 	}
 }
 
@@ -93,3 +112,4 @@ void ATetriStrikeCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
