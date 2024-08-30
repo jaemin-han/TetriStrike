@@ -33,5 +33,17 @@ public:
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
+	float Damage;
+protected:
+	virtual void BeginPlay() override;
+public:
+	void SetDamage(float DamageAmount);
+	void CalculateVelocity();
+	float VelocityMultiplier = 150.0f;
+	float VelocityMinimum = 300.0f;
+	float ImpulseMultiplier = 700.0f;
+private:
+
 };
 
