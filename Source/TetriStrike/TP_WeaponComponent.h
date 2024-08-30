@@ -55,6 +55,8 @@ public:
 	float BulletDamage;
 	bool bIncreaseStart;
 
+
+
 protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
