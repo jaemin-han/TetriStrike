@@ -49,12 +49,28 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
 
+	//void OnFireTriggered();
+	void OnFireOngoing();
+	//void OnFireCompleted();
+	float BulletDamage;
+	bool bIncreaseStart;
+
 protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	
 private:
 	/** The Character holding this weapon*/
 	ATetriStrikeCharacter* Character;
+
+private:
+//	float BulletDamage = 1.0f;
+//	bool bIncreaseStart = false;
+
+
+	
 };
