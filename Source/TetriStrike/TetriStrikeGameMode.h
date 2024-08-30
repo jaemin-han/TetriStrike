@@ -13,6 +13,15 @@ class ATetriStrikeGameMode : public AGameModeBase
 
 public:
 	ATetriStrikeGameMode();
+
+	UPROPERTY(EditAnywhere)
+	TArray<class UStaticMesh*> MeshArray;
+	UPROPERTY(EditAnywhere)
+	TArray<class UMaterial*> MaterialArray;
+
+private:
+	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
+	void LoadMaterialIntoArray(const TCHAR* MaterialPath, const int32 Index);
 };
 
 
