@@ -71,7 +71,7 @@ void AMino::Tick(float DeltaTime)
 void AMino::OnMinoHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnMinoHit: %s"), *OtherActor->GetName());
+	ProComp->SetEnableGravity(true);
 	
 	if (OtherActor->ActorHasTag(TEXT("Floor")) || OtherActor->ActorHasTag(TEXT("Mino")))
 	{
@@ -84,7 +84,6 @@ void AMino::OnMinoHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 		TGameMode->Spawner->SpawnAndMoveMino();
 		
 		ProComp->SetNotifyRigidBodyCollision(false);
-		ProComp->SetEnableGravity(true);
 	}
 }
 
