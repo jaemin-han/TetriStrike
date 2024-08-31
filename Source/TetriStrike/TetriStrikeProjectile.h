@@ -51,6 +51,7 @@ public:
 	float VelocityMultiplier = 150.0f;
 	float VelocityMinimum = 300.0f;
 	float ImpulseMultiplier = 700.0f;
+	int32 ReverseMaker = 1;
 
 
 	
