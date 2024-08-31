@@ -54,7 +54,7 @@ void ATetriStrikeProjectile::CalculateVelocity()
 	UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), Damage);
 	//FVector ForwardVector = GetOwner()->GetActorForwardVector();
 	FVector ForwardVector = GetActorForwardVector();
-	float CalculatedSpeed = Damage * 150 + 300;
+	float CalculatedSpeed = Damage * 100 + 300;
 	if(CalculatedSpeed < 0.0f)
 	{
 		CalculatedSpeed = 0.0f;
@@ -74,8 +74,8 @@ void ATetriStrikeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
 		FVector CurrentVelocity = GetVelocity();
-		int32 ReverseMaker = 1;
-		
+		//ReverseMaker = 1;
+		UE_LOG(LogTemp, Warning, TEXT("ReverseMaker: %d"), ReverseMaker);
 		FVector Impulse = CurrentVelocity * ImpulseMultiplier * ReverseMaker;
 
 		//Impulse.Z = FMath::Clamp(Impulse.Z, -1000000.0f, 0.0f);

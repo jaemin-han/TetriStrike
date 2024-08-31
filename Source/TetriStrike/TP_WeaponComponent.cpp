@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Projects.h"
 #include "SNegativeActionButton.h"
+#include "TetriStrikeReverseProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
@@ -38,18 +39,15 @@ void UTP_WeaponComponent::Fire()
 		if (World != nullptr)
 		{
 			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
-			//const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
 			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
 			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-			//const FVector SpawnLocation = Character->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
 	
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-			//ActorSpawnParams.Owner = Character;
 			
 			// Spawn the projectile at the muzzle
 			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
@@ -59,7 +57,6 @@ void UTP_WeaponComponent::Fire()
 				Projectile->SetDamage(BulletDamage);
 				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
 				Projectile->SetActorRotation(SpawnRotation);
-				//Projectile->GetProjectileMovement()->bRotationFollowsVelocity = true;
 			}
 			bIncreaseStart = false;
 
@@ -83,6 +80,65 @@ void UTP_WeaponComponent::Fire()
 		}
 	}
 }
+
+void UTP_WeaponComponent::ReverseFire()
+{
+	if (Character == nullptr || Character->GetController() == nullptr)
+	{
+		return;
+	}
+	
+	
+	// Try and fire a projectile
+	if (ReverseProjectileClass != nullptr)
+	{
+		UWorld* const World = GetWorld();
+		if (World != nullptr)
+		{
+			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
+			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
+			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+
+			//bug temp
+			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
+	
+			//Set Spawn Collision Handling Override
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+			
+			// Spawn the projectile at the muzzle
+			//TSubclassOf<ATetriStrikeProjectile> ReverseProjectileClass = ATetriStrikeReverseProjectile::StaticClass();
+			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ReverseProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			if(Projectile)
+			{
+				Projectile->SetDamage(BulletDamage);
+				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
+				Projectile->SetActorRotation(SpawnRotation);
+			}
+			bIncreaseStart = false;
+
+		}
+	}
+	BulletDamage = 1.0f;
+	// Try and play the sound if specified
+	if (FireSound != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
+	}
+	
+	// Try and play a firing animation if specified
+	if (FireAnimation != nullptr)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+}
+
 
 bool UTP_WeaponComponent::AttachWeapon(ATetriStrikeCharacter* TargetCharacter)
 {
@@ -119,6 +175,8 @@ bool UTP_WeaponComponent::AttachWeapon(ATetriStrikeCharacter* TargetCharacter)
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::OnFireOngoing);
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &UTP_WeaponComponent::Fire);
 
+			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::OnReverseFireOngoing);
+			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Completed, this, &UTP_WeaponComponent::ReverseFire);
 			
 		}
 	}
@@ -131,6 +189,10 @@ void UTP_WeaponComponent::OnFireOngoing()
 	bIncreaseStart = true;
 }
 
+void UTP_WeaponComponent::OnReverseFireOngoing()
+{
+	bIncreaseStart = true;
+}
 
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
