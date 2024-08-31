@@ -3,20 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TetriStrike.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "TP_WeaponComponent.generated.h"
 
 class ATetriStrikeCharacter;
-
+class ATetriStrikeProjectile;
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TETRISTRIKE_API UTP_WeaponComponent : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
 
 public:
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category=Projectile)
+	
+	// Select Projectile
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Projectile)
+	TSubclassOf<class ATetriStrikeProjectile> ReverseProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Projectile)
 	TSubclassOf<class ATetriStrikeProjectile> ProjectileClass;
+
+	/** Projectile class to spawn */
+	//UPROPERTY(EditDefaultsOnly, Category=Projectile)
+	//TSubclassOf<class ATetriStrikeProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
@@ -38,6 +47,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* FireAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* ReverseFireAction;
+	
 	/** Sets default values for this component's properties */
 	UTP_WeaponComponent();
 
@@ -48,9 +60,15 @@ public:
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
+	
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void ReverseFire();
 
+	
 	//void OnFireTriggered();
 	void OnFireOngoing();
+	void OnReverseFireOngoing();
+	
 	//void OnFireCompleted();
 	float BulletDamage;
 	bool bIncreaseStart;
