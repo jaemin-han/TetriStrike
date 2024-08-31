@@ -1,8 +1,19 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TetriStrikeGameMode.h"
+
+#include "MinoSpawner.h"
 #include "TetriStrikeCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
+
+void ATetriStrikeGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Spawner = Cast<AMinoSpawner>(UGameplayStatics::GetActorOfClass(GetWorld(), AMinoSpawner::StaticClass()));
+	Spawner->SpawnAndMoveMino();
+}
 
 ATetriStrikeGameMode::ATetriStrikeGameMode()
 	: Super()

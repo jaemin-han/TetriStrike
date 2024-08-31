@@ -11,6 +11,8 @@ class ATetriStrikeGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void BeginPlay() override;
 public:
 	ATetriStrikeGameMode();
 
@@ -18,6 +20,9 @@ public:
 	TArray<class UStaticMesh*> MeshArray;
 	UPROPERTY(EditAnywhere)
 	TArray<class UMaterial*> MaterialArray;
+
+	UPROPERTY(EditAnywhere)
+	class AMinoSpawner* Spawner;
 
 private:
 	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
