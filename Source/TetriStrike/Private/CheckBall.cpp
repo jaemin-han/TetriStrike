@@ -11,9 +11,12 @@
 ACheckBall::ACheckBall()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	PrimaryActorTick.bCanEverTick = false;
+	
 	SphComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphComp"));
+	SphComp->SetSphereRadius(1.0f);
+	// tick false 가 정상적으로 작동하는지 확인해야함
+	SphComp->PrimaryComponentTick.bCanEverTick = false;
 	RootComponent = SphComp;
 
 	SphComp->SetCollisionProfileName(TEXT("NoCollision"));
@@ -25,7 +28,7 @@ ACheckBall::ACheckBall()
 void ACheckBall::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	SphComp->OnComponentBeginOverlap.AddDynamic(this,&ACheckBall::OnBeginOverlap);
 	SphComp->OnComponentEndOverlap.AddDynamic(this, &ACheckBall::OnEndOverlap);
 }

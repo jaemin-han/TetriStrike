@@ -22,13 +22,13 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere)
+	int32 LayerIndex;
 
 private:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphComp;
 
-	UPROPERTY(EditAnywhere)
-	int32 LayerIndex;
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
