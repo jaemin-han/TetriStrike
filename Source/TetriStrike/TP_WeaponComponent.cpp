@@ -44,7 +44,15 @@ void UTP_WeaponComponent::Fire()
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-	
+
+			//Check Portal Function
+			if(bIsPortalGun)
+			{
+				SpawnPortal();
+				bIncreaseStart = false;
+				return;
+			}
+			
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
@@ -52,6 +60,7 @@ void UTP_WeaponComponent::Fire()
 			// Spawn the projectile at the muzzle
 			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
 			if(Projectile)
 			{
 				Projectile->SetDamage(BulletDamage);
@@ -59,7 +68,6 @@ void UTP_WeaponComponent::Fire()
 				Projectile->SetActorRotation(SpawnRotation);
 			}
 			bIncreaseStart = false;
-
 		}
 	}
 	BulletDamage = 1.0f;
@@ -87,8 +95,6 @@ void UTP_WeaponComponent::ReverseFire()
 	{
 		return;
 	}
-	
-	
 	// Try and fire a projectile
 	if (ReverseProjectileClass != nullptr)
 	{
@@ -101,7 +107,15 @@ void UTP_WeaponComponent::ReverseFire()
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-	
+
+			//Check Portal Function
+			if(bIsPortalGun)
+			{
+				SpawnPortal();
+				bIncreaseStart = false;
+				return;
+			}
+			
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
@@ -137,6 +151,17 @@ void UTP_WeaponComponent::ReverseFire()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
+}
+
+void UTP_WeaponComponent::ToggleGunFunction()
+{
+	if(bIsPortalGun)bIsPortalGun = false;
+	else bIsPortalGun = true;
+}
+
+void UTP_WeaponComponent::SpawnPortal()
+{
+	
 }
 
 
@@ -177,10 +202,10 @@ bool UTP_WeaponComponent::AttachWeapon(ATetriStrikeCharacter* TargetCharacter)
 
 			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::OnReverseFireOngoing);
 			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Completed, this, &UTP_WeaponComponent::ReverseFire);
-			
+
+			EnhancedInputComponent->BindAction(ToggleGun, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::ToggleGunFunction);
 		}
 	}
-
 	return true;
 }
 

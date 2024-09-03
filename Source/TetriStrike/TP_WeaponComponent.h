@@ -49,6 +49,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* ReverseFireAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* ToggleGun;
 	
 	/** Sets default values for this component's properties */
 	UTP_WeaponComponent();
@@ -64,6 +67,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void ReverseFire();
 
+	//Change Gun's Function between portal and projectile
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void ToggleGunFunction();
+
+	UFUNCTION(BlueprintCallable, Category= "Weapon")
+	void SpawnPortal();
 	
 	//void OnFireTriggered();
 	void OnFireOngoing();
@@ -73,7 +82,11 @@ public:
 	float BulletDamage;
 	bool bIncreaseStart;
 
+	//check gun projectile
+	bool bIsPortalGun = false;
 
+	//check portal existance
+	bool bIsPortalCreated = false;
 
 protected:
 	/** Ends gameplay for this component. */

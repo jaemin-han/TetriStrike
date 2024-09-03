@@ -1,28 +1,24 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TetriStrikeProjectile.generated.h"
+
+#include "PortalProjectile.generated.h"
 
 class USphereComponent;
 class UProjectileMovementComponent;
 
 UCLASS(config=Game)
-class ATetriStrikeProjectile : public AActor
+class TETRISTRIKE_API APortalProjectile : public AActor
 {
 	GENERATED_BODY()
-
-	/** Sphere collision component */
+	
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	USphereComponent* CollisionComp;
-
-
 public:
-	ATetriStrikeProjectile();
-
-
+	APortalProjectile();
 	/** called when projectile hits something */
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
@@ -41,18 +37,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 public:
-
-	
 	void SetDamage(float DamageAmount);
 	void CalculateVelocity();
 	float VelocityMultiplier = 150.0f;
 	float VelocityMinimum = 300.0f;
 	float ImpulseMultiplier = 700.0f;
 	int32 ReverseMaker = 1;
-
-
-	
-private:
-
 };
-
