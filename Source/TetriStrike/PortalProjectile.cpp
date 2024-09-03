@@ -5,9 +5,11 @@
 
 #include "BlendSpaceAnalysis.h"
 #include "TetriStrikeCharacter.h"
+#include "TetriStrikeGameMode.h"
 #include "TP_WeaponComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APortalProjectile::APortalProjectile() 
@@ -28,13 +30,13 @@ APortalProjectile::APortalProjectile()
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 3000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
+	ProjectileMovement->InitialSpeed = 5000.f;
+	ProjectileMovement->MaxSpeed = 5000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = true;
+	ProjectileMovement->bShouldBounce = false;
 
 	// Die after 3 seconds by default
-	InitialLifeSpan = 3.0f;
+	InitialLifeSpan = 0.3f;
 }
 void APortalProjectile::BeginPlay()
 {
@@ -45,15 +47,6 @@ void APortalProjectile::BeginPlay()
 
 void APortalProjectile::CalculateVelocity()
 {
-	/*
-	if(!GetOwner())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Owner is null"));
-		return;
-	}
-	*/
-	
-	UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), Damage);
 	//FVector ForwardVector = GetOwner()->GetActorForwardVector();
 	FVector ForwardVector = GetActorForwardVector();
 	float CalculatedSpeed = Damage * 100 + 300;
@@ -67,29 +60,43 @@ void APortalProjectile::CalculateVelocity()
 	ProjectileMovement->Velocity = Velocity;
 	ProjectileMovement->InitialSpeed = CalculatedSpeed;
 	ProjectileMovement->MaxSpeed = CalculatedSpeed;
-
-	UE_LOG(LogTemp, Warning, TEXT("CalculatedSpeed: %f, Velocity: %s"), CalculatedSpeed, *Velocity.ToString());
 }
 void APortalProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	PortalLocation = Hit.Location;
+	PortalRotation = OtherActor->GetActorRotation();
+	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	if(gm->PortalLocation != PortalLocation)
+	{
+		gm->PortalLocation = PortalLocation;
+		gm->PortalRotation = PortalRotation;
+		gm->bTransformCheck = true;
+	}
+
+	
+	// Trying to Make Portal Through weapon component
+	// TArray<AActor*> FoundActors;
+	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
+	// for(auto actor : FoundActors)
+	// {
+	// 	UTP_WeaponComponent* Gun = actor->FindComponentByClass<UTP_WeaponComponent>();
+	// 	if(Gun && Gun->bIsPortalGun)
+	// 	{
+	// 		UE_LOG(LogTemp, Warning, TEXT("Works Till here"));
+	// 		Gun->PortalLocation = PortalLocation;
+	// 		Gun->PortalRotation = PortalRotation;
+	// 	}
+	// }
+	
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
-		FVector CurrentVelocity = GetVelocity();
-		//ReverseMaker = 1;
-		UE_LOG(LogTemp, Warning, TEXT("ReverseMaker: %d"), ReverseMaker);
-		FVector Impulse = CurrentVelocity * ImpulseMultiplier * ReverseMaker;
-
-		//Impulse.Z = FMath::Clamp(Impulse.Z, -1000000.0f, 0.0f);
-		OtherComp->AddImpulseAtLocation(Impulse, GetActorLocation());
 		Destroy();
 	}
-	
 }
 
 void APortalProjectile::SetDamage(float DamageAmount)
 {
 	Damage = DamageAmount;
 	CalculateVelocity();
-	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
 }

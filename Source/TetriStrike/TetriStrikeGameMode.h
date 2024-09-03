@@ -27,7 +27,20 @@ public:
 private:
 	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
 	void LoadMaterialIntoArray(const TCHAR* MaterialPath, const int32 Index);
+
+public:
+	//Portal transform
+	UPROPERTY(BlueprintReadOnly)
+	FVector PortalLocation;
+
+	UPROPERTY(BlueprintReadOnly)
+	FRotator PortalRotation;
+	
+	//Check to see if value is in
+	UPROPERTY(BlueprintReadOnly)
+	bool bTransformCheck = false;
+
+	//Check if projectile is hit
+	UPROPERTY(BlueprintReadOnly)
+	bool bTransformChanged = false;
 };
-
-
-

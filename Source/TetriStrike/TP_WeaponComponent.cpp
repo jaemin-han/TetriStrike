@@ -12,9 +12,12 @@
 #include "Projects.h"
 #include "SNegativeActionButton.h"
 #include "TetriStrikeReverseProjectile.h"
+#include "PortalProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
+#include "TetriStrikeGameMode.h"
+#include "PortalSpawner.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values for this component's properties
@@ -44,23 +47,32 @@ void UTP_WeaponComponent::Fire()
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-
-			//Check Portal Function
-			if(bIsPortalGun)
-			{
-				SpawnPortal();
-				bIncreaseStart = false;
-				return;
-			}
 			
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 			
+			//Check Portal Function and Spawn Portal Projectile
+			if(bIsPortalGun)
+			{
+				APortalProjectile* PortalProjectile = World->SpawnActor<APortalProjectile>(PortalProjectileClass,SpawnLocation, SpawnRotation, ActorSpawnParams);
+				if(PortalProjectile)
+				{
+					PortalLocation = PortalProjectile->PortalLocation;
+					PortalRotation = PortalProjectile->PortalRotation;
+					PortalProjectile->SetDamage(BulletDamage);
+					PortalProjectile->ProjectileMovement->bRotationFollowsVelocity = true;
+					PortalProjectile->SetActorRotation(SpawnRotation);
+				}
+				bIncreaseStart = false;
+
+				SpawnPortal();
+				return;
+			}
+			
 			// Spawn the projectile at the muzzle
 			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-
 			if(Projectile)
 			{
 				Projectile->SetDamage(BulletDamage);
@@ -107,19 +119,11 @@ void UTP_WeaponComponent::ReverseFire()
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-
-			//Check Portal Function
-			if(bIsPortalGun)
-			{
-				SpawnPortal();
-				bIncreaseStart = false;
-				return;
-			}
 			
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-			
+
 			// Spawn the projectile at the muzzle
 			//TSubclassOf<ATetriStrikeProjectile> ReverseProjectileClass = ATetriStrikeReverseProjectile::StaticClass();
 			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ReverseProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
@@ -131,7 +135,6 @@ void UTP_WeaponComponent::ReverseFire()
 				Projectile->SetActorRotation(SpawnRotation);
 			}
 			bIncreaseStart = false;
-
 		}
 	}
 	BulletDamage = 1.0f;
@@ -161,7 +164,26 @@ void UTP_WeaponComponent::ToggleGunFunction()
 
 void UTP_WeaponComponent::SpawnPortal()
 {
-	
+	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	if(gm->bTransformCheck)
+	{
+		APortalSpawner* PortalSpawn = GetWorld()->SpawnActor<APortalSpawner>(PortalSpawnFactory, gm->PortalLocation, gm->PortalRotation);
+		FString temp =gm->PortalLocation.ToString();
+		FString temp1 = gm->PortalRotation.ToString();
+		UE_LOG(LogTemp, Warning, TEXT("For Check %s  %s"), *temp, *temp1);
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UTP_WeaponComponent::MyTimerFunction, 0.5f, false);
+	}
+	gm->bTransformCheck = false;
+}
+
+
+void UTP_WeaponComponent::MyTimerFunction()
+{
+	SpawnPortal();
 }
 
 
@@ -219,7 +241,6 @@ void UTP_WeaponComponent::OnReverseFireOngoing()
 	bIncreaseStart = true;
 }
 
-
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (Character == nullptr)
@@ -254,5 +275,4 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	{
 		BulletDamage = 1.0f * DeltaTime;
 	}
-
 }

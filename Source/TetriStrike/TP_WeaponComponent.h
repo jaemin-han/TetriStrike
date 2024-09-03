@@ -23,6 +23,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Projectile)
 	TSubclassOf<class ATetriStrikeProjectile> ProjectileClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Projectile)
+	TSubclassOf<class APortalProjectile> PortalProjectileClass;
+	
 	/** Projectile class to spawn */
 	//UPROPERTY(EditDefaultsOnly, Category=Projectile)
 	//TSubclassOf<class ATetriStrikeProjectile> ProjectileClass;
@@ -88,6 +91,18 @@ public:
 	//check portal existance
 	bool bIsPortalCreated = false;
 
+	//Portal transform
+	UPROPERTY()
+	FVector PortalLocation;
+
+	UPROPERTY()
+	FRotator PortalRotation;
+
+	void MyTimerFunction();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class APortalSpawner> PortalSpawnFactory;
+	
 protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
@@ -103,7 +118,4 @@ private:
 private:
 //	float BulletDamage = 1.0f;
 //	bool bIncreaseStart = false;
-
-
-	
 };
