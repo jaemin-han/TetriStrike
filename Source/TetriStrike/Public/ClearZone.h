@@ -19,7 +19,32 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* BoxComp;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* CeilingPlane;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* FloorPlane;
+	
+	UPROPERTY()
+	FTimerHandle TimerHandle1;
+	UPROPERTY()
+	FTimerHandle TimerHandle2;
+	UPROPERTY()
+	FTimerHandle TimerHandle3;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void SliceDown() const;
+	UFUNCTION()
+	void SliceUp() const;
+	UFUNCTION()
+	void DestroyCentor() const;
+
+	UFUNCTION()
+	void SliceAndDestroy();
 };
