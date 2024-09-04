@@ -39,11 +39,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	float ThresholdRatio = 0.25f;
 
+	// Score
 	UFUNCTION()
 	int32 GetScore() const {return Score;};
 
 	UFUNCTION()
 	void SetScore(const int32 NewScore){Score = NewScore;};
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UGameOverWidget> GameOverWidget;
+
+	void ShowGameOver();
 	
 private:
 	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
@@ -60,6 +66,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	int32 ScoreIncrement = 100;
+
+	class UGameOverWidget* GameOverUI;
+	
 };
 
 

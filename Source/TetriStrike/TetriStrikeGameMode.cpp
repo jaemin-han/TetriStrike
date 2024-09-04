@@ -3,6 +3,7 @@
 #include "TetriStrikeGameMode.h"
 
 #include "ClearZone.h"
+#include "GameOverWidget.h"
 #include "MinoSpawner.h"
 #include "TetriStrikeCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -64,6 +65,22 @@ void ATetriStrikeGameMode::ModifyDensity(const int32 Index, const bool bIsOverla
 	else
 	{
 		DensityArray[Index]--;
+	}
+}
+
+void ATetriStrikeGameMode::ShowGameOver()
+{
+	if (GameOverWidget)
+	{
+		GameOverUI = CreateWidget<UGameOverWidget>(GetWorld(), GameOverWidget);
+		if (GameOverUI)
+		{
+			GameOverUI->AddToViewport();
+			
+			UGameplayStatics::SetGamePaused(GetWorld(), true);
+			
+			GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+		}
 	}
 }
 
