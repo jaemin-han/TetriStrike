@@ -16,6 +16,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "MainWidget.h"
 
 // Sets default values for this component's properties
 UTP_WeaponComponent::UTP_WeaponComponent()
@@ -23,8 +24,15 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 	PrimaryComponentTick.bCanEverTick = true;
+	static ConstructorHelpers::FClassFinder<ATetriStrikeProjectile>ProjectileBPClass(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonProjectile"));
+	ProjectileClass = ProjectileBPClass.Class;
+
+	static ConstructorHelpers::FClassFinder<ATetriStrikeReverseProjectile>ReverseProjectileBPClass(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonProjectileReverse"));
+	ReverseProjectileClass = ReverseProjectileBPClass.Class;
+	//BulletDamage = 1.0f;
 }
 
+float UTP_WeaponComponent::BulletDamage = 1.0f;
 
 void UTP_WeaponComponent::Fire()
 {
@@ -121,6 +129,7 @@ void UTP_WeaponComponent::ReverseFire()
 		}
 	}
 	BulletDamage = 1.0f;
+
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
 	{
@@ -137,6 +146,7 @@ void UTP_WeaponComponent::ReverseFire()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
+	
 }
 
 
@@ -194,6 +204,11 @@ void UTP_WeaponComponent::OnReverseFireOngoing()
 	bIncreaseStart = true;
 }
 
+float UTP_WeaponComponent::GetBulletDamage() const
+{
+	return UTP_WeaponComponent::BulletDamage;
+}
+
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
@@ -216,18 +231,25 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if(bIncreaseStart)
 	{
-		if(BulletDamage < 100)
-		{
-			BulletDamage += 50.0f * DeltaTime;
-		}
-		else
-		{
-			BulletDamage = 100.0f;
-		}
+		IncreasePower();
+	}
+}
+void UTP_WeaponComponent::SetMainUI(UMainWidget* InMainUI)
+{
+	MainUI = InMainUI;
+}
+void UTP_WeaponComponent::IncreasePower()
+{
+	if(UTP_WeaponComponent::BulletDamage < 100)
+	{
+		UTP_WeaponComponent::BulletDamage += 50.0f * GetWorld()->GetDeltaSeconds();
+		UE_LOG(LogTemp, Warning, TEXT("Bulletdamage---- updated: %f"), UTP_WeaponComponent::BulletDamage);
+		
+
 	}
 	else
 	{
-		BulletDamage = 1.0f * DeltaTime;
+		UTP_WeaponComponent::BulletDamage = 100.0f;
 	}
-
 }
+

@@ -8,6 +8,7 @@
 #include "TP_WeaponComponent.generated.h"
 
 class ATetriStrikeCharacter;
+class UMainWidget;
 class ATetriStrikeProjectile;
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TETRISTRIKE_API UTP_WeaponComponent : public USkeletalMeshComponent
@@ -70,9 +71,16 @@ public:
 	void OnReverseFireOngoing();
 	
 	//void OnFireCompleted();
-	float BulletDamage;
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	float GetBulletDamage() const;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	static float BulletDamage;
 	bool bIncreaseStart;
 
+	void SetMainUI(UMainWidget* MainUI);
+
+	void IncreasePower();
 
 
 protected:
@@ -81,7 +89,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	//virtual void BeginPlay() override;
 	
 private:
 	/** The Character holding this weapon*/
@@ -91,6 +99,7 @@ private:
 //	float BulletDamage = 1.0f;
 //	bool bIncreaseStart = false;
 
-
+private:
+	UMainWidget* MainUI;
 	
 };
