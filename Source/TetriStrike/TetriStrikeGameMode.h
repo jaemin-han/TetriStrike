@@ -38,6 +38,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float ThresholdRatio = 0.25f;
+
+	UFUNCTION()
+	int32 GetScore() const {return Score;};
+
+	UFUNCTION()
+	void SetScore(const int32 NewScore){Score = NewScore;};
 	
 private:
 	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
@@ -48,6 +54,12 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void DebugDensityArray();
+
+	UPROPERTY()
+	int32 Score = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 ScoreIncrement = 100;
 };
 
 

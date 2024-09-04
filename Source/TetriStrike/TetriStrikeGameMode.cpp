@@ -53,6 +53,7 @@ void ATetriStrikeGameMode::ModifyDensity(const int32 Index, const bool bIsOverla
 			UE_LOG(LogTemp, Warning, TEXT("%d layer clear!!"), Index);
 			bAlreadyClearedArray[Index] = true;
 			ClearArray[Index]->SliceAndDestroy();
+			SetScore(GetScore() + ScoreIncrement);
 			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Index]()
 			{
 				ResetClearState(Index);
@@ -98,5 +99,11 @@ void ATetriStrikeGameMode::DebugDensityArray()
 			GEngine->AddOnScreenDebugMessage(Index,1.0f, FColor::Blue,
 				FString::Printf(TEXT("%d: %f"), Index, static_cast<double>(DensityArray[Index]) / Threshold));
 		}
+	}
+
+	if (Score > 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, GetWorld()->DeltaTimeSeconds, FColor::Red,
+			FString::Printf(TEXT("Score: %d"), GetScore()));
 	}
 }
