@@ -67,7 +67,7 @@ void AClearZone::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle1, this, &AClearZone::SliceAndDestroy, 10.0f, true);
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle1, this, &AClearZone::SliceAndDestroy, 10.0f, true);
 }
 
 // Called every frame
@@ -81,7 +81,7 @@ void AClearZone::SliceDown() const
 	TArray<UPrimitiveComponent*> OverlapArray;
 	CeilingPlane->GetOverlappingComponents(OverlapArray);
 
-	UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
+	// UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
 	for (auto* Component: OverlapArray)
 	{
 		if (Component)
@@ -103,7 +103,7 @@ void AClearZone::SliceUp() const
 	TArray<UPrimitiveComponent*> OverlapArray;
 	FloorPlane->GetOverlappingComponents(OverlapArray);
 
-	UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
+	// UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
 	for (auto* Component: OverlapArray)
 	{
 		if (Component)
@@ -125,7 +125,7 @@ void AClearZone::DestroyCentor() const
 	TArray<UPrimitiveComponent*> OverlapArray;
 	BoxComp->GetOverlappingComponents(OverlapArray);
 
-	UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
+	// UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
 	for (auto* Component: OverlapArray)
 	{
 		if (Component)
@@ -141,6 +141,7 @@ void AClearZone::DestroyCentor() const
 
 void AClearZone::SliceAndDestroy()
 {
+	UE_LOG(LogTemp, Warning, TEXT("SliceAndDestroy"));
 	SliceDown();
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle2, this, &AClearZone::SliceUp, 0.0625f, false);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, this, &AClearZone::DestroyCentor, 0.0625f, false);

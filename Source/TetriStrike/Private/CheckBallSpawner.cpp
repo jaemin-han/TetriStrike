@@ -4,6 +4,8 @@
 #include "CheckBallSpawner.h"
 
 #include "CheckBall.h"
+#include "ClearZone.h"
+#include "TetriStrike/TetriStrikeGameMode.h"
 
 
 // Sets default values
@@ -18,11 +20,14 @@ void ACheckBallSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GameMode = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	
 	// left bottom position
 	SetActorLocation(FVector(-500.0f, -500.0f, 0));
 
-	SpawnCheckBalltoWorld(GetActorLocation(), 1000.0f, 1000.0f, 1000.0f,
-		25.0f, 10);
+	SpawnCheckBall(GetActorLocation(), 1000.0f, 1000.0f, 1000.0f,
+		25.0f, 10, GameMode->ThresholdRatio);
+	SpawnClearZone();
 }
 
 // Called every frame
@@ -31,37 +36,57 @@ void ACheckBallSpawner::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACheckBallSpawner::SpawnCheckBalltoWorld(FVector StartPos, float XLength, float YLength, float ZLength,
-	float CubeRadius, int32 NumLayer)
+void ACheckBallSpawner::SpawnCheckBall(FVector StartPos, float XLength, float YLength, float ZLength,
+	float CubeRadius, int32 NumLayer, float ThresholdRatio)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SpawnCheckBalltoWorld"));
+	ThresholdRatio = FMath::Clamp(ThresholdRatio,0.0f, 1.0f);
 
 	int32 XNum = static_cast<int32>(XLength / (2 * CubeRadius));
 	int32 YNum = static_cast<int32>(YLength / (2 * CubeRadius));
 	int32 ZNum = static_cast<int32>(ZLength / (2 * CubeRadius));
 
+	GameMode->Threshold = static_cast<int32>(XNum * YNum * ZNum / NumLayer * ThresholdRatio);
+
+	int32 LayerHeight = FMath::Max(1, ZNum / NumLayer);
+	int32 CurrentLayerIndex = -1;
+	
 	for (int k = 1; k <= ZNum; ++k)
 	{
+		if ((k - 1) % LayerHeight == 0)
+		{
+			CurrentLayerIndex++;
+		}
+		
 		for (int i = 1; i <= XNum; ++i)
 		{
 			for (int j = 1; j <= YNum; ++j)
 			{
-				auto temp = GetCubeCenterPos(i, j, k, CubeRadius);
-				UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), temp.X, temp.Y, temp.Z);
 				ACheckBall* SpawnedBall = SpawnOneBall(StartPos + GetCubeCenterPos(i, j, k, CubeRadius));
-				// Index 0 ~ 9, so -1 is needed
-				SpawnedBall->LayerIndex = static_cast<int32>((k - 1) / 2);
+				SpawnedBall->LayerIndex = CurrentLayerIndex;
 			}
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%d %d %d"), XNum, YNum, ZNum);
+}
+
+void ACheckBallSpawner::SpawnClearZone()
+{
+	float ZPos = 50.0f;
+
+	for (int32 Index = 0; Index < 10; ++Index)
+	{
+		if (IsValid(ClearZone))
+		{
+			auto* SpawnedClearZone = GetWorld()->SpawnActor<AClearZone>(ClearZone, FVector(0, 0, ZPos + 100 * Index), FRotator());
+			GameMode->ClearArray.Add(SpawnedClearZone);
+		}
+	}
 }
 
 ACheckBall* ACheckBallSpawner::SpawnOneBall(FVector Pos)
 {
-	if (IsValid(Target))
+	if (IsValid(CheckBall))
 	{
-		ACheckBall* SpawnedBall = GetWorld()->SpawnActor<ACheckBall>(Target, Pos, FRotator(0, 0, 0));
+		ACheckBall* SpawnedBall = GetWorld()->SpawnActor<ACheckBall>(CheckBall, Pos, FRotator(0, 0, 0));
 		return SpawnedBall;
 	}
 	UE_LOG(LogTemp, Error, TEXT("Cannot Spawn in ACheckBallSpawner::SpawnOneBall"));

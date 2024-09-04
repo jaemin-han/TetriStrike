@@ -2,6 +2,7 @@
 
 #include "TetriStrikeGameMode.h"
 
+#include "ClearZone.h"
 #include "MinoSpawner.h"
 #include "TetriStrikeCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -46,6 +47,11 @@ void ATetriStrikeGameMode::ModifyDensity(const int32 Index, const bool bIsOverla
 {
 	if (bIsOverlap)
 	{
+		if (DensityArray[Index] > Threshold)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%d layer clear!!"), Index);
+			ClearArray[Index]->SliceAndDestroy();
+		}
 		DensityArray[Index]++;
 	}
 	else
@@ -79,7 +85,7 @@ void ATetriStrikeGameMode::DebugDensityArray()
 		for (int Index = 0; Index < DensityArray.Num(); ++Index)
 		{
 			GEngine->AddOnScreenDebugMessage(Index,1.0f, FColor::Blue,
-				FString::Printf(TEXT("%d: %d"), Index, DensityArray[Index]));
+				FString::Printf(TEXT("%d: %f"), Index, static_cast<double>(DensityArray[Index]) / Threshold));
 		}
 	}
 }
