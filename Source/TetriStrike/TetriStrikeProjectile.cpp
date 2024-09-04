@@ -37,7 +37,6 @@ ATetriStrikeProjectile::ATetriStrikeProjectile()
 void ATetriStrikeProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	CalculateVelocity();
 }
 
@@ -51,10 +50,12 @@ void ATetriStrikeProjectile::CalculateVelocity()
 	}
 	*/
 	
-	UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), Damage);
 	//FVector ForwardVector = GetOwner()->GetActorForwardVector();
 	FVector ForwardVector = GetActorForwardVector();
+	UE_LOG(LogTemp, Warning, TEXT("ProjectileDamage: %f"), Damage);
+
 	float CalculatedSpeed = Damage * 100 + 300;
+
 	if(CalculatedSpeed < 0.0f)
 	{
 		CalculatedSpeed = 0.0f;
@@ -89,7 +90,7 @@ void ATetriStrikeProjectile::SetDamage(float DamageAmount)
 {
 	Damage = DamageAmount;
 	CalculateVelocity();
-	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
+	UE_LOG(LogTemp, Warning, TEXT("SetDamage : %f"), Damage);
 
 }
 
