@@ -91,6 +91,8 @@ void AMino::OnMinoHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 	// 중력이 활성화되면 미노는 중력의 영향을 받아 아래로 떨어지게 됩니다.
 	ProComp->SetEnableGravity(true);
 
+	ProComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
+
 	/* 충돌한 액터(OtherActor)가 "Floor" 또는 "Mino" 태그를 가지고 있는지 확인합니다.
 	"Floor" 태그는 바닥을 의미하며, "Mino" 태그는 다른 미노 블록을 의미합니다.
 	즉, 미노가 바닥이나 다른 미노와 충돌했을 때만 아래 코드를 실행합니다.  */
