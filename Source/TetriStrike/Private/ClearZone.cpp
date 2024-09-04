@@ -141,7 +141,7 @@ void AClearZone::DestroyCentor() const
 
 void AClearZone::SliceAndDestroy()
 {
-	SliceUp();
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle2, this, &AClearZone::SliceDown, 0.05f, false);
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, this, &AClearZone::DestroyCentor, 0.05f, false);
+	SliceDown();
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle2, this, &AClearZone::SliceUp, 0.0625f, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, this, &AClearZone::DestroyCentor, 0.0625f, false);
 }
