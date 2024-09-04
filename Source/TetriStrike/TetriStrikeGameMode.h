@@ -43,6 +43,8 @@ private:
 	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
 	void LoadMaterialIntoArray(const TCHAR* MaterialPath, const int32 Index);
 
+	TArray<bool> bAlreadyClearedArray;
+	void ResetClearState(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
 	void DebugDensityArray();

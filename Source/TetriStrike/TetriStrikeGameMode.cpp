@@ -41,16 +41,22 @@ ATetriStrikeGameMode::ATetriStrikeGameMode()
 
 	// init density array
 	DensityArray.Init(0, 10);
+	bAlreadyClearedArray.Init(false, 10);
 }
 
 void ATetriStrikeGameMode::ModifyDensity(const int32 Index, const bool bIsOverlap)
 {
 	if (bIsOverlap)
 	{
-		if (DensityArray[Index] > Threshold)
+		if (DensityArray[Index] > Threshold && !bAlreadyClearedArray[Index])
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%d layer clear!!"), Index);
+			bAlreadyClearedArray[Index] = true;
 			ClearArray[Index]->SliceAndDestroy();
+			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Index]()
+			{
+				ResetClearState(Index);
+			});
 		}
 		DensityArray[Index]++;
 	}
@@ -76,6 +82,11 @@ void ATetriStrikeGameMode::LoadMaterialIntoArray(const TCHAR* MaterialPath, cons
 		MaterialArray[Index] = MaterialFinder.Object;
 	else
 		UE_LOG(LogTemp, Error, TEXT("Failed to load material at %s"), MaterialPath);
+}
+
+void ATetriStrikeGameMode::ResetClearState(int32 Index)
+{
+	bAlreadyClearedArray[Index] = false;
 }
 
 void ATetriStrikeGameMode::DebugDensityArray()
