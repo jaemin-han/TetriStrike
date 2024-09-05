@@ -63,23 +63,6 @@ void ATetriStrikeCharacter::BeginPlay()
 		
 	}
 
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	if(MainUIFactory && PlayerController)
-	{
-		UMainWidget* MainUI = CreateWidget<UMainWidget>(PlayerController,MainUIFactory);
-		if(MainUI)
-		{
-			MainUI->AddToViewport();
-			MainUI->WeaponComponent = TP_WeaponComponent;
-
-			if(TP_WeaponComponent)
-			{
-				TP_WeaponComponent->SetMainUI(MainUI);
-			}
-			//MainUI->UpdateRadialSlider();
-		}
-	}
-
 }
 
 //////////////////////////////////////////////////////////////////////////// Input

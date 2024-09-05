@@ -32,6 +32,7 @@ void UMainWidget::UpdateRadialSlider()
 void UMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+	
 	UpdateRadialSlider();
 
 }
