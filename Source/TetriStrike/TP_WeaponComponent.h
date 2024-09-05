@@ -71,10 +71,12 @@ public:
 	void OnReverseFireOngoing();
 	
 	//void OnFireCompleted();
+//
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	float GetBulletDamage() const;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+//	float BulletDamage;
 	static float BulletDamage;
 	bool bIncreaseStart;
 

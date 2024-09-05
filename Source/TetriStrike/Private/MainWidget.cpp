@@ -8,7 +8,16 @@
 void UMainWidget::UpdateRadialSlider()
 {
 	UE_LOG(LogTemp, Warning, TEXT("test: %f"), WeaponComponent->BulletDamage);
-
+	if(!WeaponComponent)
+	{
+		return;
+		
+	}
+	if(!RadialSlider)
+	{
+		return;
+		
+	}
 	if(WeaponComponent && RadialSlider)
 	{
 		//ATetriStrikeCharacter* test;
@@ -17,6 +26,7 @@ void UMainWidget::UpdateRadialSlider()
 		//float DamagePercent = Character->TP_WeaponComponent->GetBulletDamage() / 100.0f;
 		//UE_LOG(LogTemp, Warning, TEXT("test: %f"),DamagePercent );
 
+//		float DamagePercentage = BulletDamage / 100.0f;
 		float DamagePercent = UTP_WeaponComponent::BulletDamage/100.0f;
 		//float DamagePercent = WeaponComponent->GetBulletDamage() /100.0f;
 		RadialSlider->SetValue(DamagePercent);

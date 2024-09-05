@@ -62,7 +62,7 @@ void UTP_WeaponComponent::Fire()
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			if(Projectile)
 			{
-				Projectile->SetDamage(BulletDamage);
+				Projectile->SetDamage(UTP_WeaponComponent::BulletDamage);
 				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
 				Projectile->SetActorRotation(SpawnRotation);
 			}
@@ -70,7 +70,7 @@ void UTP_WeaponComponent::Fire()
 
 		}
 	}
-	BulletDamage = 1.0f;
+	UTP_WeaponComponent::BulletDamage = 1.0f;
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
 	{
@@ -120,7 +120,7 @@ void UTP_WeaponComponent::ReverseFire()
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			if(Projectile)
 			{
-				Projectile->SetDamage(BulletDamage);
+				Projectile->SetDamage(UTP_WeaponComponent::BulletDamage);
 				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
 				Projectile->SetActorRotation(SpawnRotation);
 			}
@@ -128,7 +128,7 @@ void UTP_WeaponComponent::ReverseFire()
 
 		}
 	}
-	BulletDamage = 1.0f;
+	UTP_WeaponComponent::BulletDamage = 1.0f;
 
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
@@ -204,6 +204,7 @@ void UTP_WeaponComponent::OnReverseFireOngoing()
 	bIncreaseStart = true;
 }
 
+
 float UTP_WeaponComponent::GetBulletDamage() const
 {
 	return UTP_WeaponComponent::BulletDamage;
@@ -240,6 +241,7 @@ void UTP_WeaponComponent::SetMainUI(UMainWidget* InMainUI)
 }
 void UTP_WeaponComponent::IncreasePower()
 {
+	
 	if(UTP_WeaponComponent::BulletDamage < 100)
 	{
 		UTP_WeaponComponent::BulletDamage += 50.0f * GetWorld()->GetDeltaSeconds();
@@ -251,5 +253,6 @@ void UTP_WeaponComponent::IncreasePower()
 	{
 		UTP_WeaponComponent::BulletDamage = 100.0f;
 	}
+	
 }
 
