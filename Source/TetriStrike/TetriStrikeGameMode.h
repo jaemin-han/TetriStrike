@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "PortalTypeEnum.h"
+
 #include "TetriStrikeGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -74,8 +76,27 @@ private:
 	int32 ScoreIncrement = 100;
 
 	class UGameOverWidget* GameOverUI;
+
+public:
+	//Portal transform
+	UPROPERTY(BlueprintReadOnly)
+	FVector PortalLocation;
+
+	UPROPERTY(BlueprintReadOnly)
+	FRotator PortalRotation;
+
+	//Check to see if value is in
+	UPROPERTY(BlueprintReadOnly)
+	bool bTransformCheck = false;
+
+	//Check if projectile is hit
+	UPROPERTY(BlueprintReadOnly)
+	bool bTransformChanged = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	int PortalCount = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	EPortalType PortalType = EPortalType::Not_Valid;
 	
 };
-
-
-

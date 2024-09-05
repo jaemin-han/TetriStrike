@@ -24,6 +24,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Projectile)
 	TSubclassOf<class ATetriStrikeProjectile> ProjectileClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
+	TSubclassOf<class APortalProjectile> PortalProjectileClass;
+
 	/** Projectile class to spawn */
 	//UPROPERTY(EditDefaultsOnly, Category=Projectile)
 	//TSubclassOf<class ATetriStrikeProjectile> ProjectileClass;
@@ -32,6 +35,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	USoundBase* FireSound;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	USoundBase* PortalGunFireSound;
+
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimMontage* FireAnimation;
@@ -50,6 +56,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* ReverseFireAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ToggleGun;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* DestroyPortal;
 	
 	/** Sets default values for this component's properties */
 	UTP_WeaponComponent();
@@ -65,6 +77,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void ReverseFire();
 
+	//Change Gun's Function between portal and projectile
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void ToggleGunFunction();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void SpawnPortal();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void PortalSeekAndDestroy();
 	
 	//void OnFireTriggered();
 	void OnFireOngoing();
@@ -84,6 +105,23 @@ public:
 
 	void IncreasePower();
 
+	//check gun projectile
+	bool bIsPortalGun = false;
+
+	//check portal existance
+	bool bIsPortalCreated = false;
+
+	//Portal transform
+	UPROPERTY()
+	FVector PortalLocation;
+
+	UPROPERTY()
+	FRotator PortalRotation;
+
+	void MyTimerFunction();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class APortalSpawner> PortalSpawnFactory;
 
 protected:
 	/** Ends gameplay for this component. */

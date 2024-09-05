@@ -12,11 +12,14 @@
 #include "Projects.h"
 #include "SNegativeActionButton.h"
 #include "TetriStrikeReverseProjectile.h"
+#include "PortalProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "MainWidget.h"
+#include "TetriStrikeGameMode.h"
+#include "PortalSpawner.h"
 
 // Sets default values for this component's properties
 UTP_WeaponComponent::UTP_WeaponComponent()
@@ -52,46 +55,73 @@ void UTP_WeaponComponent::Fire()
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-	
+
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-			
+
+			// Try and play the sound if specified
+			if (bIsPortalGun)
+			{
+				if (PortalGunFireSound != nullptr)
+				{
+					UGameplayStatics::PlaySoundAtLocation(this, PortalGunFireSound, Character->GetActorLocation());
+				}
+			}
+			else
+			{
+				if (FireSound != nullptr)
+				{
+					UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
+				}
+			}
+
+			// Try and play a firing animation if specified
+			if (FireAnimation != nullptr)
+			{
+				// Get the animation object for the arms mesh
+				UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
+				if (AnimInstance != nullptr)
+				{
+					AnimInstance->Montage_Play(FireAnimation, 1.f);
+				}
+			}
+
+			//Check Portal Function and Spawn Portal Projectile
+			if (bIsPortalGun)
+			{
+				APortalProjectile* PortalProjectile = World->SpawnActor<APortalProjectile>(PortalProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				if (PortalProjectile)
+				{
+					PortalLocation = PortalProjectile->PortalLocation;
+					PortalRotation = PortalProjectile->PortalRotation;
+					PortalProjectile->SetDamage(BulletDamage);
+					PortalProjectile->ProjectileMovement->bRotationFollowsVelocity = true;
+					PortalProjectile->SetActorRotation(SpawnRotation);
+				}
+				bIncreaseStart = false;
+				SpawnPortal();
+				return;
+			}
+
 			// Spawn the projectile at the muzzle
 			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			if(Projectile)
+			if (Projectile)
 			{
-				Projectile->SetDamage(UTP_WeaponComponent::BulletDamage);
+				Projectile->SetDamage(BulletDamage);
 				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
 				Projectile->SetActorRotation(SpawnRotation);
 			}
 			bIncreaseStart = false;
-
 		}
 	}
-	UTP_WeaponComponent::BulletDamage = 1.0f;
-	// Try and play the sound if specified
-	if (FireSound != nullptr)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
-	}
-	
-	// Try and play a firing animation if specified
-	if (FireAnimation != nullptr)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
-		if (AnimInstance != nullptr)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
+	BulletDamage = 1.0f;
 }
 
 void UTP_WeaponComponent::ReverseFire()
 {
-	if (Character == nullptr || Character->GetController() == nullptr)
+	if (Character == nullptr || Character->GetController() == nullptr || bIsPortalGun)
 	{
 		return;
 	}
@@ -187,11 +217,61 @@ bool UTP_WeaponComponent::AttachWeapon(ATetriStrikeCharacter* TargetCharacter)
 
 			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::OnReverseFireOngoing);
 			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Completed, this, &UTP_WeaponComponent::ReverseFire);
-			
+
+			EnhancedInputComponent->BindAction(ToggleGun, ETriggerEvent::Started, this, &UTP_WeaponComponent::ToggleGunFunction);
+			EnhancedInputComponent->BindAction(DestroyPortal, ETriggerEvent::Started, this, &UTP_WeaponComponent::PortalSeekAndDestroy);
 		}
 	}
 
 	return true;
+}
+
+void UTP_WeaponComponent::ToggleGunFunction()
+{
+	if (bIsPortalGun)bIsPortalGun = false;
+	else bIsPortalGun = true;
+}
+
+void UTP_WeaponComponent::SpawnPortal()
+{
+	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	if (gm->bTransformCheck)
+	{
+		APortalSpawner* PortalSpawn = GetWorld()->SpawnActor<APortalSpawner>(PortalSpawnFactory, gm->PortalLocation, gm->PortalRotation);
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UTP_WeaponComponent::MyTimerFunction, 0.5f, false);
+	}
+	gm->bTransformCheck = false;
+}
+
+void UTP_WeaponComponent::PortalSeekAndDestroy()
+{
+	TArray<AActor*> FoundActors;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		if (Actor->GetName().Contains("Portal"))
+		{
+			Actor->Destroy();
+		}
+	}
+	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	if (gm)
+	{
+		gm->PortalCount = 0;
+	}
+
+}
+
+
+void UTP_WeaponComponent::MyTimerFunction()
+{
+	SpawnPortal();
 }
 
 void UTP_WeaponComponent::OnFireOngoing()
@@ -255,4 +335,3 @@ void UTP_WeaponComponent::IncreasePower()
 	}
 	
 }
-
