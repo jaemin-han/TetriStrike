@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PortalTypeEnum.h"
+
 #include "PortalSpawner.generated.h"
 
 UCLASS()
@@ -22,4 +24,7 @@ protected:
 public:	
 	UPROPERTY(BlueprintReadOnly)
 	bool bShouldCreatePortal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EPortalType PortalType = EPortalType::Not_Valid;
 };

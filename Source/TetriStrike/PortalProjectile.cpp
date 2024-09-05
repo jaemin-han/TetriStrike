@@ -36,7 +36,7 @@ APortalProjectile::APortalProjectile()
 	ProjectileMovement->bShouldBounce = false;
 
 	// Die after 3 seconds by default
-	InitialLifeSpan = 0.3f;
+	InitialLifeSpan = 1.0f;
 }
 void APortalProjectile::BeginPlay()
 {
@@ -72,8 +72,31 @@ void APortalProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		gm->PortalRotation = PortalRotation;
 		gm->bTransformCheck = true;
 	}
-
 	
+	if(OtherActor->ActorHasTag(FName("Floor")))
+	{
+	    gm->PortalType = EPortalType::Floor;
+	}
+	else if(OtherActor->ActorHasTag(FName("Front")))
+	{
+	    gm->PortalType = EPortalType::Front;
+	}
+	else if(OtherActor->ActorHasTag(FName("Right")))
+	{
+	    gm->PortalType = EPortalType::Right;
+	}
+	else if(OtherActor->ActorHasTag(FName("Left")))
+    {
+        gm->PortalType = EPortalType::Left;
+    }
+    else if(OtherActor->ActorHasTag(FName("Back")))
+    {
+        gm->PortalType = EPortalType::Back;
+    }
+	else
+	{
+		gm->PortalType = EPortalType::Not_Valid;
+	}
 	// Trying to Make Portal Through weapon component
 	// TArray<AActor*> FoundActors;
 	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
@@ -87,7 +110,6 @@ void APortalProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	// 		Gun->PortalRotation = PortalRotation;
 	// 	}
 	// }
-	
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{

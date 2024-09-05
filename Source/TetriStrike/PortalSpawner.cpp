@@ -2,7 +2,7 @@
 
 
 #include "PortalSpawner.h"
-
+#include "TetriStrikeGameMode.h"
 // Sets default values
 APortalSpawner::APortalSpawner()
 {
@@ -15,5 +15,14 @@ APortalSpawner::APortalSpawner()
 void APortalSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	if(gm->PortalType != EPortalType::Not_Valid)
+	{
+		PortalType = gm->PortalType;
+		gm->PortalType = EPortalType::Not_Valid;
+	}
+	else
+	{
+		Destroy();
+	}
 }

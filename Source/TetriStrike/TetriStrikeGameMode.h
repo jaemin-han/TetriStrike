@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "PortalTypeEnum.h"
+
 #include "TetriStrikeGameMode.generated.h"
+
 
 UCLASS(minimalapi)
 class ATetriStrikeGameMode : public AGameModeBase
@@ -43,4 +46,7 @@ public:
 	//Check if projectile is hit
 	UPROPERTY(BlueprintReadOnly)
 	bool bTransformChanged = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	EPortalType PortalType = EPortalType::Not_Valid;
 };
