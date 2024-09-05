@@ -34,6 +34,13 @@ protected:
 	FTimerHandle TimerHandle2;
 	UPROPERTY()
 	FTimerHandle TimerHandle3;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* Effect;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* Sound;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -47,4 +54,10 @@ public:
 
 	UFUNCTION()
 	void SliceAndDestroy();
+
+	UFUNCTION()
+	void SpawnEffect();
+
+	UFUNCTION()
+	void SpawnSound();
 };
