@@ -16,9 +16,10 @@
 #include "Animation/AnimInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "MainWidget.h"
 #include "TetriStrikeGameMode.h"
 #include "PortalSpawner.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values for this component's properties
 UTP_WeaponComponent::UTP_WeaponComponent()
@@ -26,8 +27,15 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 	PrimaryComponentTick.bCanEverTick = true;
+	static ConstructorHelpers::FClassFinder<ATetriStrikeProjectile>ProjectileBPClass(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonProjectile"));
+	ProjectileClass = ProjectileBPClass.Class;
+
+	static ConstructorHelpers::FClassFinder<ATetriStrikeReverseProjectile>ReverseProjectileBPClass(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonProjectileReverse"));
+	ReverseProjectileClass = ReverseProjectileBPClass.Class;
+	//BulletDamage = 1.0f;
 }
 
+float UTP_WeaponComponent::BulletDamage = 1.0f;
 
 void UTP_WeaponComponent::Fire()
 {
@@ -47,13 +55,13 @@ void UTP_WeaponComponent::Fire()
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-			
+
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	
+
 			// Try and play the sound if specified
-			if(bIsPortalGun)
+			if (bIsPortalGun)
 			{
 				if (PortalGunFireSound != nullptr)
 				{
@@ -78,12 +86,12 @@ void UTP_WeaponComponent::Fire()
 					AnimInstance->Montage_Play(FireAnimation, 1.f);
 				}
 			}
-			
+
 			//Check Portal Function and Spawn Portal Projectile
-			if(bIsPortalGun)
+			if (bIsPortalGun)
 			{
-				APortalProjectile* PortalProjectile = World->SpawnActor<APortalProjectile>(PortalProjectileClass,SpawnLocation, SpawnRotation, ActorSpawnParams);
-				if(PortalProjectile)
+				APortalProjectile* PortalProjectile = World->SpawnActor<APortalProjectile>(PortalProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				if (PortalProjectile)
 				{
 					PortalLocation = PortalProjectile->PortalLocation;
 					PortalRotation = PortalProjectile->PortalRotation;
@@ -95,11 +103,11 @@ void UTP_WeaponComponent::Fire()
 				SpawnPortal();
 				return;
 			}
-			
+
 			// Spawn the projectile at the muzzle
 			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			if(Projectile)
+			if (Projectile)
 			{
 				Projectile->SetDamage(BulletDamage);
 				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
@@ -117,6 +125,8 @@ void UTP_WeaponComponent::ReverseFire()
 	{
 		return;
 	}
+	
+	
 	// Try and fire a projectile
 	if (ReverseProjectileClass != nullptr)
 	{
@@ -129,25 +139,27 @@ void UTP_WeaponComponent::ReverseFire()
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-			
+	
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
+			
 			// Spawn the projectile at the muzzle
 			//TSubclassOf<ATetriStrikeProjectile> ReverseProjectileClass = ATetriStrikeReverseProjectile::StaticClass();
 			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ReverseProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			if(Projectile)
 			{
-				Projectile->SetDamage(BulletDamage);
+				Projectile->SetDamage(UTP_WeaponComponent::BulletDamage);
 				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
 				Projectile->SetActorRotation(SpawnRotation);
 			}
 			bIncreaseStart = false;
+
 		}
 	}
-	BulletDamage = 1.0f;
+	UTP_WeaponComponent::BulletDamage = 1.0f;
+
 	// Try and play the sound if specified
 	if (FireSound != nullptr)
 	{
@@ -164,54 +176,7 @@ void UTP_WeaponComponent::ReverseFire()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
-}
-
-void UTP_WeaponComponent::ToggleGunFunction()
-{
-	if(bIsPortalGun)bIsPortalGun = false;
-	else bIsPortalGun = true;
-}
-
-void UTP_WeaponComponent::SpawnPortal()
-{
-	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
-	if(gm->bTransformCheck)
-	{
-		APortalSpawner* PortalSpawn = GetWorld()->SpawnActor<APortalSpawner>(PortalSpawnFactory, gm->PortalLocation, gm->PortalRotation);
-	}
-	else
-	{
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UTP_WeaponComponent::MyTimerFunction, 0.5f, false);
-	}
-	gm->bTransformCheck = false;
-}
-
-void UTP_WeaponComponent::PortalSeekAndDestroy()
-{
-	TArray<AActor*> FoundActors;
 	
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
-	
-	for (AActor* Actor : FoundActors)
-	{
-		if(Actor->GetName().Contains("Portal"))
-		{
-			Actor->Destroy();
-		}
-	}
-	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
-	if(gm)
-	{
-		gm->PortalCount = 0;
-	}
-	
-}
-
-
-void UTP_WeaponComponent::MyTimerFunction()
-{
-	SpawnPortal();
 }
 
 
@@ -257,7 +222,56 @@ bool UTP_WeaponComponent::AttachWeapon(ATetriStrikeCharacter* TargetCharacter)
 			EnhancedInputComponent->BindAction(DestroyPortal, ETriggerEvent::Started, this, &UTP_WeaponComponent::PortalSeekAndDestroy);
 		}
 	}
+
 	return true;
+}
+
+void UTP_WeaponComponent::ToggleGunFunction()
+{
+	if (bIsPortalGun)bIsPortalGun = false;
+	else bIsPortalGun = true;
+}
+
+void UTP_WeaponComponent::SpawnPortal()
+{
+	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	if (gm->bTransformCheck)
+	{
+		APortalSpawner* PortalSpawn = GetWorld()->SpawnActor<APortalSpawner>(PortalSpawnFactory, gm->PortalLocation, gm->PortalRotation);
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UTP_WeaponComponent::MyTimerFunction, 0.5f, false);
+	}
+	gm->bTransformCheck = false;
+}
+
+void UTP_WeaponComponent::PortalSeekAndDestroy()
+{
+	TArray<AActor*> FoundActors;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		if (Actor->GetName().Contains("Portal"))
+		{
+			Actor->Destroy();
+		}
+	}
+	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	if (gm)
+	{
+		gm->PortalCount = 0;
+	}
+
+}
+
+
+void UTP_WeaponComponent::MyTimerFunction()
+{
+	SpawnPortal();
 }
 
 void UTP_WeaponComponent::OnFireOngoing()
@@ -269,6 +283,13 @@ void UTP_WeaponComponent::OnReverseFireOngoing()
 {
 	bIncreaseStart = true;
 }
+
+
+float UTP_WeaponComponent::GetBulletDamage() const
+{
+	return UTP_WeaponComponent::BulletDamage;
+}
+
 
 void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
@@ -291,17 +312,26 @@ void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if(bIncreaseStart)
 	{
-		if(BulletDamage < 100)
-		{
-			BulletDamage += 50.0f * DeltaTime;
-		}
-		else
-		{
-			BulletDamage = 100.0f;
-		}
+		IncreasePower();
+	}
+}
+void UTP_WeaponComponent::SetMainUI(UMainWidget* InMainUI)
+{
+	MainUI = InMainUI;
+}
+void UTP_WeaponComponent::IncreasePower()
+{
+	
+	if(UTP_WeaponComponent::BulletDamage < 100)
+	{
+		UTP_WeaponComponent::BulletDamage += 50.0f * GetWorld()->GetDeltaSeconds();
+		UE_LOG(LogTemp, Warning, TEXT("Bulletdamage---- updated: %f"), UTP_WeaponComponent::BulletDamage);
+		
+
 	}
 	else
 	{
-		BulletDamage = 1.0f * DeltaTime;
+		UTP_WeaponComponent::BulletDamage = 100.0f;
 	}
+	
 }
