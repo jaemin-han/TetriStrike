@@ -2,8 +2,19 @@
 
 
 #include "MainWidget.h"
+
+#include "Components/TextBlock.h"
 #include "TetriStrike/TetriStrikeCharacter.h"
+#include "TetriStrike/TetriStrikeGameMode.h"
 #include "TetriStrike/TP_WeaponComponent.h"
+
+void UMainWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	GameMode = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	PlayTime = GameMode->PlayTime;	
+}
 
 void UMainWidget::UpdateRadialSlider()
 {
@@ -39,9 +50,17 @@ void UMainWidget::UpdateRadialSlider()
 	}
 }
 
+float UMainWidget::GetPlayTime()
+{
+	float NewTime = PlayTime - static_cast<float>(GetWorld()->GetTimeSeconds());
+	return FMath::Max(NewTime, 0.0f);
+}
+
 void UMainWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 	UpdateRadialSlider();
 
+	ScoreData->SetText(FText::AsNumber(GameMode->GetScore()));
+	TimeData->SetText(FText::AsNumber(GetPlayTime()));
 }

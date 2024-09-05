@@ -84,6 +84,16 @@ void ATetriStrikeGameMode::ShowGameOver()
 	}
 }
 
+void ATetriStrikeGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (PlayTime < GetWorld()->GetTimeSeconds())
+	{
+		ShowGameOver();
+	}
+}
+
 void ATetriStrikeGameMode::LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index)
 {
 	ConstructorHelpers::FObjectFinder<UStaticMesh> MeshFinder(MeshPath);
