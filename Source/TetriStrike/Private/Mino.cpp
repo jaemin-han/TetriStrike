@@ -36,12 +36,13 @@ void AMino::InitializeProComp()
 {
 	ATetriStrikeGameMode* GameMode = Cast<ATetriStrikeGameMode>(UGameplayStatics::GetGameMode(this));
 
-	const int32 Index = FMath::RandRange(0, GameMode->MeshArray.Num() - 1);
+	const int32 Index1 = FMath::RandRange(0, GameMode->MeshArray.Num() - 1);
+	const int32 Index2 = FMath::RandRange(0, GameMode->MeshArray.Num() - 1);
 	
-	UStaticMesh* MyMesh = GameMode->MeshArray[Index];
+	UStaticMesh* MyMesh = GameMode->MeshArray[Index1];
 	MeshComp->SetStaticMesh(MyMesh);
 	
-	UMaterial* MyMat = GameMode->MaterialArray[Index];
+	UMaterial* MyMat = GameMode->MaterialArray[Index2];
 
 	UKismetProceduralMeshLibrary::CopyProceduralMeshFromStaticMeshComponent(MeshComp, 0, ProComp, true);
 	MeshComp->DestroyComponent();
@@ -91,7 +92,6 @@ void AMino::OnMinoHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 	// 중력이 활성화되면 미노는 중력의 영향을 받아 아래로 떨어지게 됩니다.
 	ProComp->SetEnableGravity(true);
 
-	ProComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
 
 	/* 충돌한 액터(OtherActor)가 "Floor" 또는 "Mino" 태그를 가지고 있는지 확인합니다.
 	"Floor" 태그는 바닥을 의미하며, "Mino" 태그는 다른 미노 블록을 의미합니다.
@@ -104,6 +104,8 @@ void AMino::OnMinoHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 		이로 인해 한 번의 충돌에서 한 개의 미노만 스폰됩니다. */
 		if (!bCanSpawn)	return;
 		bCanSpawn = false;
+
+		ProComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
 
 		/* 현재 월드의 게임 모드를 가져오고, 이를 ATetriStrikeGameMode로 캐스팅합니다.
 		ATetriStrikeGameMode의 Spawner를 통해 새로운 미노를 스폰하고 이동시키는 SpawnAndMoveMino 함수를 호출합니다.
