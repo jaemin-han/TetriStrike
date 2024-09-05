@@ -5,8 +5,9 @@
 
 #include "KismetProceduralMeshLibrary.h"
 #include "ProceduralMeshComponent.h"
-#include "Chaos/AABBTree.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 
 
 // Sets default values
@@ -60,6 +61,12 @@ AClearZone::AClearZone()
 	// visible setting
 	CeilingPlane->SetVisibility(false);
 	FloorPlane->SetVisibility(false);
+
+	// ConstructorHelpers::FObjectFinder<UParticleSystem> ObjectFinder(TEXT("/Script/Engine.ParticleSystem'/Game/StarterContent/Particles/P_Explosion.P_Explosion'"));
+	// if (ObjectFinder.Succeeded())
+	// {
+	// 	Effect = ObjectFinder.Object;
+	// }
 }
 
 // Called when the game starts or when spawned
@@ -145,4 +152,43 @@ void AClearZone::SliceAndDestroy()
 	SliceDown();
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle2, this, &AClearZone::SliceUp, 0.0625f, false);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, this, &AClearZone::DestroyCentor, 0.0625f, false);
+	SpawnEffect();
+	SpawnSound();
+}
+
+
+void AClearZone::SpawnEffect()
+{
+	if (Effect)
+	{
+		// ClearZone의 중심 위치
+		FVector CenterLocation = GetActorLocation();
+
+		// 그리드 설정
+		const int32 GridSize = 5; // 5x5 그리드
+		const float GridSpacing = 200.0f; // 각 이펙트 간의 간격
+
+		// 이펙트를 5x5 그리드에 맞춰 스폰
+		for (int32 X = 0; X < GridSize; ++X)
+		{
+			for (int32 Y = 0; Y < GridSize; ++Y)
+			{
+				// 각 위치의 좌표를 계산
+				FVector SpawnLocation = CenterLocation;
+				SpawnLocation.X += (X - GridSize / 2) * GridSpacing;
+				SpawnLocation.Y += (Y - GridSize / 2) * GridSpacing;
+
+				// Z축은 CenterLocation의 Z와 동일하게 유지
+				SpawnLocation.Z = CenterLocation.Z;
+
+				// 파티클 이펙트 스폰
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Effect, SpawnLocation, FRotator::ZeroRotator);
+			}
+		}
+	}
+}
+
+void AClearZone::SpawnSound()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), Sound);
 }
