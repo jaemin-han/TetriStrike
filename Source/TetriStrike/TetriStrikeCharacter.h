@@ -8,7 +8,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Logging/LogMacros.h"
 #include "TP_WeaponComponent.h"
-#include "Blueprint/UserWidget.h"
 #include "TetriStrikeCharacter.generated.h"
 
 class UInputComponent;
