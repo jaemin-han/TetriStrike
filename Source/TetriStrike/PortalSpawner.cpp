@@ -16,9 +16,11 @@ void APortalSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
-	if(gm->PortalType != EPortalType::Not_Valid)
+	
+	if(gm->PortalType != EPortalType::Not_Valid && gm->PortalCount < 2)
 	{
 		PortalType = gm->PortalType;
+		gm->PortalCount++;
 		gm->PortalType = EPortalType::Not_Valid;
 	}
 	else

@@ -48,5 +48,8 @@ public:
 	bool bTransformChanged = false;
 
 	UPROPERTY(BlueprintReadOnly)
+	int PortalCount = 0;
+	
+	UPROPERTY(BlueprintReadOnly)
 	EPortalType PortalType = EPortalType::Not_Valid;
 };

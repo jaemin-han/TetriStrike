@@ -33,6 +33,9 @@ public:
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	USoundBase* FireSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	USoundBase* PortalGunFireSound;
 	
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -55,6 +58,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* ToggleGun;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* DestroyPortal;
 	
 	/** Sets default values for this component's properties */
 	UTP_WeaponComponent();
@@ -76,6 +82,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category= "Weapon")
 	void SpawnPortal();
+
+	UFUNCTION(BlueprintCallable, Category= "Weapon")
+	void PortalSeekAndDestroy();
 	
 	//void OnFireTriggered();
 	void OnFireOngoing();
