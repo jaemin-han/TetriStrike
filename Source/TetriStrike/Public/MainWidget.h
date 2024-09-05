@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/RadialSlider.h"
+#include "Components/ScaleBox.h"
+#include "Components/CanvasPanel.h"
 #include "MainWidget.generated.h"
 
 /**
@@ -16,6 +18,9 @@ class TETRISTRIKE_API UMainWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+
+
+	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	class URadialSlider* RadialSlider;
 
@@ -25,4 +30,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void UpdateRadialSlider();
 	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	
 };
