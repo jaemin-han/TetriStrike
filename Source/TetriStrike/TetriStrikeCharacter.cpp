@@ -9,7 +9,14 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "MainWidget.h"
+#include "TetriStrikePlayerController.h"
+#include "TP_WeaponComponent.h"
+#include "MainWidget.h"
+#include "NetworkMessage.h"
+#include "TetriStrikePlayerController.h"
 #include "Engine/LocalPlayer.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -36,6 +43,9 @@ ATetriStrikeCharacter::ATetriStrikeCharacter()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	TP_WeaponComponent = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("TP_WeaponComponent"));
+	TP_WeaponComponent->SetupAttachment(Mesh1P);
+	
 }
 
 void ATetriStrikeCharacter::BeginPlay()
@@ -49,7 +59,12 @@ void ATetriStrikeCharacter::BeginPlay()
 		MovementComponent->MaxFlySpeed = 1200.0f;
 		MovementComponent->BrakingDecelerationFlying = 7000.0f;
 		//MovementComponent->SetMovementMode(MOVE_Flying);
+
+		
 	}
+
+	
+
 }
 
 //////////////////////////////////////////////////////////////////////////// Input

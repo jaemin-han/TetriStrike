@@ -15,4 +15,5 @@ void ATetriStrikePlayerController::BeginPlay()
 		// add the mapping context so we get controls
 		Subsystem->AddMappingContext(InputMappingContext, 0);
 	}
+	//MYWidgetInstance->WeaponComponet = Character-> TP_WeaponComponent;
 }
