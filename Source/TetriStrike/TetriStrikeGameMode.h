@@ -52,6 +52,12 @@ public:
 	TSubclassOf<class UGameOverWidget> GameOverWidget;
 
 	void ShowGameOver();
+
+	// PlayTime
+	UPROPERTY(EditAnywhere)
+	float PlayTime = 120.0;
+
+	virtual void Tick(float DeltaSeconds) override;
 	
 private:
 	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
