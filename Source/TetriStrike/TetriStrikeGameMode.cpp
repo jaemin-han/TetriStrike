@@ -39,33 +39,7 @@ ATetriStrikeGameMode::ATetriStrikeGameMode()
 	LoadMaterialIntoArray(TEXT("/Script/Engine.Material'/Game/Materials/CameraLitVertexColor_temp.CameraLitVertexColor_temp'"), 2);
 	LoadMaterialIntoArray(TEXT("/Script/Engine.Material'/Game/Materials/CameraLitVertexColor_temp2.CameraLitVertexColor_temp2'"), 3);
 	LoadMaterialIntoArray(TEXT("/Script/Engine.Material'/Game/Materials/M_Procedural_Sky_MASTER03.M_Procedural_Sky_MASTER03'"), 4);
-
-	// init density array
-	DensityArray.Init(0, 10);
-	bAlreadyClearedArray.Init(false, 10);
-}
-
-void ATetriStrikeGameMode::ModifyDensity(const int32 Index, const bool bIsOverlap)
-{
-	if (bIsOverlap)
-	{
-		if (DensityArray[Index] > Threshold && !bAlreadyClearedArray[Index])
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%d layer clear!!"), Index);
-			bAlreadyClearedArray[Index] = true;
-			ClearArray[Index]->SliceAndDestroy();
-			SetScore(GetScore() + ScoreIncrement);
-			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Index]()
-			{
-				ResetClearState(Index);
-			});
-		}
-		DensityArray[Index]++;
-	}
-	else
-	{
-		DensityArray[Index]--;
-	}
+	
 }
 
 void ATetriStrikeGameMode::ShowGameOver()
@@ -112,25 +86,5 @@ void ATetriStrikeGameMode::LoadMaterialIntoArray(const TCHAR* MaterialPath, cons
 		UE_LOG(LogTemp, Error, TEXT("Failed to load material at %s"), MaterialPath);
 }
 
-void ATetriStrikeGameMode::ResetClearState(int32 Index)
-{
-	bAlreadyClearedArray[Index] = false;
-}
 
-void ATetriStrikeGameMode::DebugDensityArray()
-{
-	if (GEngine)
-	{
-		for (int Index = 0; Index < DensityArray.Num(); ++Index)
-		{
-			GEngine->AddOnScreenDebugMessage(Index,1.0f, FColor::Blue,
-				FString::Printf(TEXT("%d: %f"), Index, static_cast<double>(DensityArray[Index]) / Threshold));
-		}
-	}
 
-	if (Score > 0)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, GetWorld()->DeltaTimeSeconds, FColor::Red,
-			FString::Printf(TEXT("Score: %d"), GetScore()));
-	}
-}

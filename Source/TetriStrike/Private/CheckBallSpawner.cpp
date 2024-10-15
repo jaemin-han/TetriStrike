@@ -27,13 +27,18 @@ void ACheckBallSpawner::BeginPlay()
 
 	SpawnCheckBall(GetActorLocation(), 1000.0f, 1000.0f, 1000.0f,
 		25.0f, 10, GameMode->ThresholdRatio);
+
 	SpawnClearZone();
+	UE_LOG(LogTemp, Warning, TEXT("AClearZone::ClearArray.Num(): %d"), AClearZone::ClearArray.Num());
 }
 
 // Called every frame
 void ACheckBallSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Debug
+	ACheckBall::DebugDensity();
 }
 
 void ACheckBallSpawner::SpawnCheckBall(FVector StartPos, float XLength, float YLength, float ZLength,
@@ -45,7 +50,7 @@ void ACheckBallSpawner::SpawnCheckBall(FVector StartPos, float XLength, float YL
 	int32 YNum = static_cast<int32>(YLength / (2 * CubeRadius));
 	int32 ZNum = static_cast<int32>(ZLength / (2 * CubeRadius));
 
-	GameMode->Threshold = static_cast<int32>(XNum * YNum * ZNum / NumLayer * ThresholdRatio);
+	ACheckBall::Threshold = static_cast<int32>(XNum * YNum * ZNum / NumLayer * ThresholdRatio);
 
 	int32 LayerHeight = FMath::Max(1, ZNum / NumLayer);
 	int32 CurrentLayerIndex = -1;
@@ -64,20 +69,6 @@ void ACheckBallSpawner::SpawnCheckBall(FVector StartPos, float XLength, float YL
 				ACheckBall* SpawnedBall = SpawnOneBall(StartPos + GetCubeCenterPos(i, j, k, CubeRadius));
 				SpawnedBall->LayerIndex = CurrentLayerIndex;
 			}
-		}
-	}
-}
-
-void ACheckBallSpawner::SpawnClearZone()
-{
-	float ZPos = 50.0f;
-
-	for (int32 Index = 0; Index < 10; ++Index)
-	{
-		if (IsValid(ClearZone))
-		{
-			auto* SpawnedClearZone = GetWorld()->SpawnActor<AClearZone>(ClearZone, FVector(0, 0, ZPos + 100 * Index), FRotator());
-			GameMode->ClearArray.Add(SpawnedClearZone);
 		}
 	}
 }
@@ -101,5 +92,21 @@ FVector ACheckBallSpawner::GetCubeCenterPos(int32 XNum, int32 YNum, int32 ZNum, 
 
 	return {XLen, YLen, ZLen};
 }
+
+void ACheckBallSpawner::SpawnClearZone()
+{
+	AClearZone::ClearArray.Empty();
+	
+	float ZPos = 50.0f;
+
+	for (int32 Index = 0; Index < 10; ++Index)
+	{
+		auto* SpawnedClearZone = GetWorld()->SpawnActor<AClearZone>(ClearZone, FVector(0, 0, ZPos + 100 * Index), FRotator(0));
+		AClearZone::ClearArray.Add(SpawnedClearZone);
+		// GameMode->ClearArray.Add(SpawnedClearZone);
+	}
+}
+
+
 
 

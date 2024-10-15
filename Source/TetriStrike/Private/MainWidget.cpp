@@ -18,7 +18,7 @@ void UMainWidget::NativeConstruct()
 
 void UMainWidget::UpdateRadialSlider()
 {
-	UE_LOG(LogTemp, Warning, TEXT("test: %f"), WeaponComponent->BulletDamage);
+	// UE_LOG(LogTemp, Warning, TEXT("test: %f"), WeaponComponent->BulletDamage);
 	if(!WeaponComponent)
 	{
 		return;

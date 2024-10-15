@@ -3,9 +3,13 @@
 
 #include "CheckBall.h"
 
+#include "ClearZone.h"
 #include "Components/SphereComponent.h"
 #include "TetriStrike/TetriStrikeGameMode.h"
 
+TArray<int32> ACheckBall::DensityArray;
+int32 ACheckBall::Threshold;
+ATetriStrikeGameMode* ACheckBall::GameMode;
 
 // Sets default values
 ACheckBall::ACheckBall()
@@ -22,12 +26,17 @@ ACheckBall::ACheckBall()
 	SphComp->SetCollisionProfileName(TEXT("NoCollision"));
 	SphComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
+
+	DensityArray.Init(0, 10);
 }
 
 // Called when the game starts or when spawned
 void ACheckBall::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GameMode = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+
 	
 	SphComp->OnComponentBeginOverlap.AddDynamic(this,&ACheckBall::OnBeginOverlap);
 	SphComp->OnComponentEndOverlap.AddDynamic(this, &ACheckBall::OnEndOverlap);
@@ -39,19 +48,45 @@ void ACheckBall::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACheckBall::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ACheckBall::ModifyDensity(int32 Index, bool bIsOverlap)
 {
-	auto* GameMode = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
+	if (bIsOverlap)
+	{
+		DensityArray[Index]++;
+		if (DensityArray[Index] > Threshold)
+		{
+			AClearZone::ClearArray[Index]->SliceAndDestroy();
+			// GameMode->ClearArray[Index]->SliceAndDestroy();
+		}
+		
+	}
+	else
+	{
+		DensityArray[Index]--;
+	}
+}
 
-	GameMode->ModifyDensity(LayerIndex, true);
+void ACheckBall::DebugDensity()
+{
+	if (GEngine)
+	{
+		for (int Index = 0; Index < DensityArray.Num(); ++Index)
+		{
+			GEngine->AddOnScreenDebugMessage(Index, 1.0f, FColor::Blue,
+				FString::Printf(TEXT("%d: %d"), Index, DensityArray[Index]));
+		}
+	}
+}
+
+void ACheckBall::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ModifyDensity(LayerIndex, true);
 }
 
 void ACheckBall::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	auto GameMode = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
-
-	GameMode->ModifyDensity(LayerIndex, false);
+	ModifyDensity(LayerIndex, false);
 }
 

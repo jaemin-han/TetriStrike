@@ -25,9 +25,21 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 LayerIndex;
 
+	static TArray<int32> DensityArray;
+
+	UFUNCTION(BlueprintCallable)
+	static void DebugDensity();
+
+	static int32 Threshold;
 private:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphComp;
+
+	UFUNCTION()
+	static void ModifyDensity(int32 Index, bool bIsOverlap);
+
+	static class ATetriStrikeGameMode* GameMode;
+
 
 
 	UFUNCTION()

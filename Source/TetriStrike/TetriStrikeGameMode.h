@@ -27,15 +27,6 @@ public:
 	class AMinoSpawner* Spawner;
 
 	UPROPERTY(EditAnywhere)
-	TArray<int32> DensityArray;
-
-	UPROPERTY(EditAnywhere)
-	TArray<class AClearZone*> ClearArray;
-
-	UFUNCTION(BlueprintCallable)
-	void ModifyDensity(int32 Index, bool bIsOverlap);
-
-	UPROPERTY(EditAnywhere)
 	int32 Threshold;
 
 	UPROPERTY(EditAnywhere)
@@ -62,12 +53,7 @@ public:
 private:
 	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
 	void LoadMaterialIntoArray(const TCHAR* MaterialPath, const int32 Index);
-
-	TArray<bool> bAlreadyClearedArray;
-	void ResetClearState(int32 Index);
-
-	UFUNCTION(BlueprintCallable)
-	void DebugDensityArray();
+	
 
 	UPROPERTY()
 	int32 Score = 0;

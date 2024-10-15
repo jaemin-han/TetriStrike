@@ -60,4 +60,10 @@ public:
 
 	UFUNCTION()
 	void SpawnSound();
+
+	static TArray<AClearZone*> ClearArray;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ClearZone")
+	bool bIsDestroying = false;
+private:
 };
