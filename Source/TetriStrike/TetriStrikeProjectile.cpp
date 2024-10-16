@@ -65,7 +65,7 @@ void ATetriStrikeProjectile::CalculateVelocity()
 	ProjectileMovement->Velocity = Velocity;
 	ProjectileMovement->InitialSpeed = CalculatedSpeed;
 	ProjectileMovement->MaxSpeed = CalculatedSpeed;
-
+	
 	UE_LOG(LogTemp, Warning, TEXT("CalculatedSpeed: %f, Velocity: %s"), CalculatedSpeed, *Velocity.ToString());
 }
 void ATetriStrikeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -78,8 +78,8 @@ void ATetriStrikeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 		UE_LOG(LogTemp, Warning, TEXT("ReverseMaker: %d"), ReverseMaker);
 		FVector Impulse = CurrentVelocity * ImpulseMultiplier * ReverseMaker;
 
-		//Impulse.Z = FMath::Clamp(Impulse.Z, -1000000.0f, 0.0f);
-		OtherComp->AddImpulseAtLocation(Impulse, GetActorLocation());
+		// OtherComp->AddImpulseAtLocation(Impulse, GetActorLocation());
+		OtherComp->AddImpulseAtLocation(Impulse, OtherComp->GetCenterOfMass());
 		Destroy();
 	}
 	

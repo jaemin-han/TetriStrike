@@ -324,7 +324,7 @@ void UTP_WeaponComponent::IncreasePower()
 	
 	if(UTP_WeaponComponent::BulletDamage < 100)
 	{
-		UTP_WeaponComponent::BulletDamage += 50.0f * GetWorld()->GetDeltaSeconds();
+		UTP_WeaponComponent::BulletDamage += IncreasePowerMultiplier * GetWorld()->GetDeltaSeconds();
 		UE_LOG(LogTemp, Warning, TEXT("Bulletdamage---- updated: %f"), UTP_WeaponComponent::BulletDamage);
 		
 

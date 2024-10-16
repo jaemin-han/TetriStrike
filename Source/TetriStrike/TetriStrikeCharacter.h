@@ -82,10 +82,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	UTP_WeaponComponent* TP_WeaponComponent;
-
+	
 private:
-		
-
-
+	
 };
 

@@ -45,8 +45,8 @@ public:
 	
 	void SetDamage(float DamageAmount);
 	void CalculateVelocity();
-	float VelocityMultiplier = 150.0f;
 	float VelocityMinimum = 300.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Multiplier)
 	float ImpulseMultiplier = 700.0f;
 	int32 ReverseMaker = 1;
 
