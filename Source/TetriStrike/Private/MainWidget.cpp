@@ -13,23 +13,21 @@ void UMainWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	GameMode = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
-	PlayTime = GameMode->PlayTime;	
+	PlayTime = GameMode->PlayTime;
 }
 
 void UMainWidget::UpdateRadialSlider()
 {
 	// UE_LOG(LogTemp, Warning, TEXT("test: %f"), WeaponComponent->BulletDamage);
-	if(!WeaponComponent)
+	if (!WeaponComponent)
 	{
 		return;
-		
 	}
-	if(!RadialSlider)
+	if (!RadialSlider)
 	{
 		return;
-		
 	}
-	if(WeaponComponent && RadialSlider)
+	if (WeaponComponent && RadialSlider)
 	{
 		//ATetriStrikeCharacter* test;
 		ATetriStrikeCharacter* Character = Cast<ATetriStrikeCharacter>(GetOwningPlayerPawn());
@@ -37,12 +35,10 @@ void UMainWidget::UpdateRadialSlider()
 		//float DamagePercent = Character->TP_WeaponComponent->GetBulletDamage() / 100.0f;
 		//UE_LOG(LogTemp, Warning, TEXT("test: %f"),DamagePercent );
 
-//		float DamagePercentage = BulletDamage / 100.0f;
-		float DamagePercent = UTP_WeaponComponent::BulletDamage/100.0f;
+		//		float DamagePercentage = BulletDamage / 100.0f;
+		float DamagePercent = UTP_WeaponComponent::BulletDamage / 100.0f;
 		//float DamagePercent = WeaponComponent->GetBulletDamage() /100.0f;
 		RadialSlider->SetValue(DamagePercent);
-
-		
 	}
 	else
 	{

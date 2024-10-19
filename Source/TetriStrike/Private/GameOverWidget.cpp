@@ -24,5 +24,5 @@ void UGameOverWidget::Quit()
 	UWorld* CurrentWorld = GetWorld();
 
 	UKismetSystemLibrary::QuitGame(CurrentWorld, CurrentWorld->GetFirstPlayerController(),
-		EQuitPreference::Quit, false);
+	                               EQuitPreference::Quit, false);
 }

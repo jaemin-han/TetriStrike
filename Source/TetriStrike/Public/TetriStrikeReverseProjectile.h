@@ -13,7 +13,7 @@ UCLASS()
 class TETRISTRIKE_API ATetriStrikeReverseProjectile : public ATetriStrikeProjectile
 {
 	GENERATED_BODY()
-protected:
 
+protected:
 	virtual void BeginPlay();
 };

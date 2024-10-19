@@ -16,7 +16,7 @@ ACheckBall::ACheckBall()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	
+
 	SphComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphComp"));
 	SphComp->SetSphereRadius(1.0f);
 	// tick false 가 정상적으로 작동하는지 확인해야함
@@ -37,8 +37,8 @@ void ACheckBall::BeginPlay()
 
 	GameMode = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
 
-	
-	SphComp->OnComponentBeginOverlap.AddDynamic(this,&ACheckBall::OnBeginOverlap);
+
+	SphComp->OnComponentBeginOverlap.AddDynamic(this, &ACheckBall::OnBeginOverlap);
 	SphComp->OnComponentEndOverlap.AddDynamic(this, &ACheckBall::OnEndOverlap);
 }
 
@@ -58,7 +58,6 @@ void ACheckBall::ModifyDensity(int32 Index, bool bIsOverlap)
 			AClearZone::ClearArray[Index]->SliceAndDestroy();
 			// GameMode->ClearArray[Index]->SliceAndDestroy();
 		}
-		
 	}
 	else
 	{
@@ -73,20 +72,20 @@ void ACheckBall::DebugDensity()
 		for (int Index = 0; Index < DensityArray.Num(); ++Index)
 		{
 			GEngine->AddOnScreenDebugMessage(Index, 1.0f, FColor::Blue,
-				FString::Printf(TEXT("%d: %d"), Index, DensityArray[Index]));
+			                                 FString::Printf(TEXT("%d: %d"), Index, DensityArray[Index]));
 		}
 	}
 }
 
 void ACheckBall::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                const FHitResult& SweepResult)
 {
 	ModifyDensity(LayerIndex, true);
 }
 
 void ACheckBall::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+                              UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	ModifyDensity(LayerIndex, false);
 }
-

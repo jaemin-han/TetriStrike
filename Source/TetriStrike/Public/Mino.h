@@ -24,12 +24,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
 private:
-	
 	UPROPERTY(VisibleAnywhere)
 	class UProceduralMeshComponent* ProComp;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* MeshComp;
 
@@ -38,9 +36,8 @@ private:
 
 	UFUNCTION()
 	void OnMinoHit(UPrimitiveComponent* HitComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		FVector NormalImpulse,
-		const FHitResult& Hit);
-
+	               AActor* OtherActor,
+	               UPrimitiveComponent* OtherComp,
+	               FVector NormalImpulse,
+	               const FHitResult& Hit);
 };

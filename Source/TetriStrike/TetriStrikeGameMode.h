@@ -15,6 +15,7 @@ class ATetriStrikeGameMode : public AGameModeBase
 
 protected:
 	virtual void BeginPlay() override;
+
 public:
 	ATetriStrikeGameMode();
 
@@ -34,10 +35,10 @@ public:
 
 	// Score
 	UFUNCTION()
-	int32 GetScore() const {return Score;};
+	int32 GetScore() const { return Score; };
 
 	UFUNCTION()
-	void SetScore(const int32 NewScore){Score = NewScore;};
+	void SetScore(const int32 NewScore) { Score = NewScore; };
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UGameOverWidget> GameOverWidget;
@@ -49,11 +50,11 @@ public:
 	float PlayTime = 120.0;
 
 	virtual void Tick(float DeltaSeconds) override;
-	
+
 private:
 	void LoadMeshIntoArray(const TCHAR* MeshPath, const int32 Index);
 	void LoadMaterialIntoArray(const TCHAR* MaterialPath, const int32 Index);
-	
+
 
 	UPROPERTY()
 	int32 Score = 0;
@@ -84,5 +85,4 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	EPortalType PortalType = EPortalType::Not_Valid;
-	
 };

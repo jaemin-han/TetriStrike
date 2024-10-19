@@ -17,13 +17,13 @@ class TETRISTRIKE_API UGameOverWidget : public UUserWidget
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* Button_Restart;
-	
+
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* Button_Quit;
 
 protected:
 	virtual void NativeConstruct() override;
-	
+
 private:
 	UFUNCTION()
 	void Restart();

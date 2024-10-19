@@ -31,6 +31,7 @@ public:
 	static void DebugDensity();
 
 	static int32 Threshold;
+
 private:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphComp;
@@ -41,18 +42,17 @@ private:
 	static class ATetriStrikeGameMode* GameMode;
 
 
-
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
+	                    AActor* OtherActor,
+	                    UPrimitiveComponent* OtherComp,
+	                    int32 OtherBodyIndex,
+	                    bool bFromSweep,
+	                    const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void OnEndOverlap(UPrimitiveComponent* OverlappedComponent,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex);
+	                  AActor* OtherActor,
+	                  UPrimitiveComponent* OtherComp,
+	                  int32 OtherBodyIndex);
 };

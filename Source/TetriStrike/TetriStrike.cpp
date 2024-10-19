@@ -3,5 +3,4 @@
 #include "TetriStrike.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, TetriStrike, "TetriStrike" );
- 
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, TetriStrike, "TetriStrike");

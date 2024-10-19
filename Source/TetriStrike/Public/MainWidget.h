@@ -11,6 +11,7 @@
  * 
  */
 class UTP_WeaponComponent;
+
 UCLASS()
 class TETRISTRIKE_API UMainWidget : public UUserWidget
 {
@@ -18,7 +19,7 @@ class TETRISTRIKE_API UMainWidget : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
-	
+
 public:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	class URadialSlider* RadialSlider;
@@ -41,7 +42,7 @@ public:
 
 	UFUNCTION()
 	float GetPlayTime();
-	
+
 	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 private:

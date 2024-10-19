@@ -28,7 +28,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void SpawnCheckBall(FVector StartPos, float XLength, float YLength, float ZLength,
-		float CubeRadius, int32 NumLayer, float ThresholdRatio);
+	                    float CubeRadius, int32 NumLayer, float ThresholdRatio);
 
 private:
 	ACheckBall* SpawnOneBall(FVector Pos);
@@ -38,5 +38,4 @@ private:
 	void SpawnClearZone();
 
 	class ATetriStrikeGameMode* GameMode;
-	
 };

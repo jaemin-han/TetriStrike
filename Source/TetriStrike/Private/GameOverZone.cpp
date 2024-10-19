@@ -14,7 +14,8 @@ AGameOverZone::AGameOverZone()
 
 	PlaneComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneComp"));
 	RootComponent = PlaneComp;
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneMesh(TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Plane.Plane'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneMesh(
+		TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Plane.Plane'"));
 	if (PlaneMesh.Succeeded())
 	{
 		PlaneComp->SetStaticMesh(PlaneMesh.Object);
@@ -35,7 +36,8 @@ void AGameOverZone::BeginPlay()
 }
 
 void AGameOverZone::OnPlaneCompBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                            const FHitResult& SweepResult)
 {
 	auto* GameMode = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
 
@@ -51,4 +53,3 @@ void AGameOverZone::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-
