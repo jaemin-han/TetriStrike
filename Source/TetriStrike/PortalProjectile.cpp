@@ -12,13 +12,14 @@
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
-APortalProjectile::APortalProjectile() 
+APortalProjectile::APortalProjectile()
 {
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentHit.AddDynamic(this, &APortalProjectile::OnHit);		// set up a notification for when this component hits something blocking
+	CollisionComp->OnComponentHit.AddDynamic(this, &APortalProjectile::OnHit);
+	// set up a notification for when this component hits something blocking
 
 	// Players can't walk on it
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
@@ -38,10 +39,11 @@ APortalProjectile::APortalProjectile()
 	// Die after 3 seconds by default
 	InitialLifeSpan = 1.0f;
 }
+
 void APortalProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	CalculateVelocity();
 }
 
@@ -50,7 +52,7 @@ void APortalProjectile::CalculateVelocity()
 	//FVector ForwardVector = GetOwner()->GetActorForwardVector();
 	FVector ForwardVector = GetActorForwardVector();
 	float CalculatedSpeed = Damage * 100 + 300;
-	if(CalculatedSpeed < 0.0f)
+	if (CalculatedSpeed < 0.0f)
 	{
 		CalculatedSpeed = 0.0f;
 	}
@@ -61,38 +63,40 @@ void APortalProjectile::CalculateVelocity()
 	ProjectileMovement->InitialSpeed = CalculatedSpeed;
 	ProjectileMovement->MaxSpeed = CalculatedSpeed;
 }
-void APortalProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+
+void APortalProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                              FVector NormalImpulse, const FHitResult& Hit)
 {
 	PortalLocation = Hit.Location;
 	PortalRotation = OtherActor->GetActorRotation();
 	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
-	if(gm->PortalLocation != PortalLocation)
+	if (gm->PortalLocation != PortalLocation)
 	{
 		gm->PortalLocation = PortalLocation;
 		gm->PortalRotation = PortalRotation;
 		gm->bTransformCheck = true;
 	}
-	
-	if(OtherActor->ActorHasTag(FName("Floor")))
+
+	if (OtherActor->ActorHasTag(FName("Floor")))
 	{
-	    gm->PortalType = EPortalType::Floor;
+		gm->PortalType = EPortalType::Floor;
 	}
-	else if(OtherActor->ActorHasTag(FName("Front")))
+	else if (OtherActor->ActorHasTag(FName("Front")))
 	{
-	    gm->PortalType = EPortalType::Front;
+		gm->PortalType = EPortalType::Front;
 	}
-	else if(OtherActor->ActorHasTag(FName("Right")))
+	else if (OtherActor->ActorHasTag(FName("Right")))
 	{
-	    gm->PortalType = EPortalType::Right;
+		gm->PortalType = EPortalType::Right;
 	}
-	else if(OtherActor->ActorHasTag(FName("Left")))
-    {
-        gm->PortalType = EPortalType::Left;
-    }
-    else if(OtherActor->ActorHasTag(FName("Back")))
-    {
-        gm->PortalType = EPortalType::Back;
-    }
+	else if (OtherActor->ActorHasTag(FName("Left")))
+	{
+		gm->PortalType = EPortalType::Left;
+	}
+	else if (OtherActor->ActorHasTag(FName("Back")))
+	{
+		gm->PortalType = EPortalType::Back;
+	}
 	else
 	{
 		gm->PortalType = EPortalType::Not_Valid;

@@ -20,20 +20,22 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACheckBall> CheckBall;
-	UPROPERTY(EditAnywhere)
+
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AClearZone> ClearZone;
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void SpawnCheckBall(FVector StartPos, float XLength, float YLength, float ZLength,
-		float CubeRadius, int32 NumLayer, float ThresholdRatio);
-	void SpawnClearZone();
+	                    float CubeRadius, int32 NumLayer, float ThresholdRatio);
 
 private:
 	ACheckBall* SpawnOneBall(FVector Pos);
 	FVector GetCubeCenterPos(int32 XNum, int32 YNum, int32 ZNum, float CubeRadius);
 
+	UFUNCTION()
+	void SpawnClearZone();
+
 	class ATetriStrikeGameMode* GameMode;
-	
 };

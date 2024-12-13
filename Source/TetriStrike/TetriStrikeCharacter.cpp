@@ -27,7 +27,7 @@ ATetriStrikeCharacter::ATetriStrikeCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
+
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
@@ -45,7 +45,6 @@ ATetriStrikeCharacter::ATetriStrikeCharacter()
 
 	TP_WeaponComponent = CreateDefaultSubobject<UTP_WeaponComponent>(TEXT("TP_WeaponComponent"));
 	TP_WeaponComponent->SetupAttachment(Mesh1P);
-	
 }
 
 void ATetriStrikeCharacter::BeginPlay()
@@ -59,18 +58,13 @@ void ATetriStrikeCharacter::BeginPlay()
 		MovementComponent->MaxFlySpeed = 1200.0f;
 		MovementComponent->BrakingDecelerationFlying = 7000.0f;
 		//MovementComponent->SetMovementMode(MOVE_Flying);
-
-		
 	}
-
-	
-
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
 void ATetriStrikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{	
+{
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
@@ -86,7 +80,10 @@ void ATetriStrikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	}
 	else
 	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		UE_LOG(LogTemplateCharacter, Error,
+		       TEXT(
+			       "'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
+		       ), *GetNameSafe(this));
 	}
 }
 
@@ -127,4 +124,3 @@ void ATetriStrikeCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
-

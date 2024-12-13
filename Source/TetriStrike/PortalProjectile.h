@@ -18,26 +18,27 @@ class TETRISTRIKE_API APortalProjectile : public AActor
 public:
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	USphereComponent* CollisionComp;
-	
+
 	APortalProjectile();
-	
+
 	/** called when projectile hits something */
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse,
+	           const FHitResult& Hit);
 
 	/** Returns CollisionComp subobject **/
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
-	
+
 	/** Returns ProjectileMovement subobject **/
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
-	
+
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
-	
+
 protected:
 	virtual void BeginPlay() override;
-	
+
 public:
 	void SetDamage(float DamageAmount);
 	void CalculateVelocity();
@@ -46,7 +47,7 @@ public:
 	float ImpulseMultiplier = 700.0f;
 	int32 ReverseMaker = 1;
 	float Damage;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Portal Creation")
 	FVector PortalLocation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Portal Creation")

@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
 
+TArray<AClearZone*> AClearZone::ClearArray;
 
 // Sets default values
 AClearZone::AClearZone()
@@ -27,7 +28,8 @@ AClearZone::AClearZone()
 	FloorPlane->SetupAttachment(RootComponent);
 
 	// Applying Plane Mesh 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneMesh(TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Plane.Plane'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneMesh(
+		TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Plane.Plane'"));
 	if (PlaneMesh.Succeeded())
 	{
 		CeilingPlane->SetStaticMesh(PlaneMesh.Object);
@@ -53,7 +55,7 @@ AClearZone::AClearZone()
 	CeilingPlane->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CeilingPlane->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CeilingPlane->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
-	
+
 	FloorPlane->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	FloorPlane->SetCollisionResponseToAllChannels(ECR_Ignore);
 	FloorPlane->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
@@ -62,19 +64,13 @@ AClearZone::AClearZone()
 	CeilingPlane->SetVisibility(false);
 	FloorPlane->SetVisibility(false);
 
-	// ConstructorHelpers::FObjectFinder<UParticleSystem> ObjectFinder(TEXT("/Script/Engine.ParticleSystem'/Game/StarterContent/Particles/P_Explosion.P_Explosion'"));
-	// if (ObjectFinder.Succeeded())
-	// {
-	// 	Effect = ObjectFinder.Object;
-	// }
+	// spawn clear zone
 }
 
 // Called when the game starts or when spawned
 void AClearZone::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle1, this, &AClearZone::SliceAndDestroy, 10.0f, true);
 }
 
 // Called every frame
@@ -88,9 +84,27 @@ void AClearZone::SliceDown() const
 	TArray<UPrimitiveComponent*> OverlapArray;
 	CeilingPlane->GetOverlappingComponents(OverlapArray);
 
-	// UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
-	for (auto* Component: OverlapArray)
+	// if (OverlapArray.Num() == 0)
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("No overlapping components found"));
+	// 	return;
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("overlapping components Num: %d"), OverlapArray.Num());
+	//
+	// }
+
+	UE_LOG(LogTemp, Warning, TEXT("SliceDown Num %d"), OverlapArray.Num());
+	for (auto* Component : OverlapArray)
 	{
+		// Component가 유효한지 확인
+		if (!Component)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Invalid component (null) in OverlapArray"));
+			continue;
+		}
+
 		if (Component)
 		{
 			UProceduralMeshComponent* ProMeshComp = Cast<UProceduralMeshComponent>(Component);
@@ -98,8 +112,10 @@ void AClearZone::SliceDown() const
 			{
 				FVector SlicePos = CeilingPlane->GetComponentLocation();
 				UKismetProceduralMeshLibrary::SliceProceduralMesh(ProMeshComp, SlicePos,
-					FVector(0, 0, 1), false,
-					ProMeshComp, EProcMeshSliceCapOption::UseLastSectionForCap, nullptr);
+				                                                  FVector(0, 0, 1), false,
+				                                                  ProMeshComp,
+				                                                  EProcMeshSliceCapOption::UseLastSectionForCap,
+				                                                  nullptr);
 			}
 		}
 	}
@@ -110,8 +126,8 @@ void AClearZone::SliceUp() const
 	TArray<UPrimitiveComponent*> OverlapArray;
 	FloorPlane->GetOverlappingComponents(OverlapArray);
 
-	// UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
-	for (auto* Component: OverlapArray)
+	UE_LOG(LogTemp, Warning, TEXT("SliceUp Num %d"), OverlapArray.Num());
+	for (auto* Component : OverlapArray)
 	{
 		if (Component)
 		{
@@ -120,8 +136,10 @@ void AClearZone::SliceUp() const
 			{
 				FVector SlicePos = FloorPlane->GetComponentLocation();
 				UKismetProceduralMeshLibrary::SliceProceduralMesh(ProMeshComp, SlicePos,
-					FVector(0, 0, -1), false,
-					ProMeshComp, EProcMeshSliceCapOption::UseLastSectionForCap, nullptr);
+				                                                  FVector(0, 0, -1), false,
+				                                                  ProMeshComp,
+				                                                  EProcMeshSliceCapOption::UseLastSectionForCap,
+				                                                  nullptr);
 			}
 		}
 	}
@@ -132,8 +150,8 @@ void AClearZone::DestroyCentor() const
 	TArray<UPrimitiveComponent*> OverlapArray;
 	BoxComp->GetOverlappingComponents(OverlapArray);
 
-	// UE_LOG(LogTemp, Warning, TEXT("Num %d"), OverlapArray.Num());
-	for (auto* Component: OverlapArray)
+	UE_LOG(LogTemp, Warning, TEXT("DestroyCentor Num %d"), OverlapArray.Num());
+	for (auto* Component : OverlapArray)
 	{
 		if (Component)
 		{
@@ -148,12 +166,25 @@ void AClearZone::DestroyCentor() const
 
 void AClearZone::SliceAndDestroy()
 {
-	UE_LOG(LogTemp, Warning, TEXT("SliceAndDestroy"));
+	if (bIsDestroying)
+	{
+		// UE_LOG(LogTemp, Warning, TEXT("SliceAndDestroy is already in progress."));
+		return;
+	}
+	bIsDestroying = true;
+
+
 	SliceDown();
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle2, this, &AClearZone::SliceUp, 0.0625f, false);
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle3, this, &AClearZone::DestroyCentor, 0.0625f, false);
 	SpawnEffect();
 	SpawnSound();
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle1, [this]()
+	{
+		bIsDestroying = false;
+		UE_LOG(LogTemp, Warning, TEXT("SliceAndDestroy completed, ready for next execution."));
+	}, 1.0f, false);
 }
 
 

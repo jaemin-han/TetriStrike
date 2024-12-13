@@ -27,7 +27,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* FloorPlane;
-	
+
 	UPROPERTY()
 	FTimerHandle TimerHandle1;
 	UPROPERTY()
@@ -40,7 +40,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	class USoundBase* Sound;
-	
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -60,4 +60,11 @@ public:
 
 	UFUNCTION()
 	void SpawnSound();
+
+	static TArray<AClearZone*> ClearArray;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ClearZone")
+	bool bIsDestroying = false;
+
+private:
 };

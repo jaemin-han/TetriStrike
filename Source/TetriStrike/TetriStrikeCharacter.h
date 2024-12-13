@@ -39,9 +39,7 @@ class ATetriStrikeCharacter : public ACharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
-	
 
-	
 public:
 	ATetriStrikeCharacter();
 
@@ -51,8 +49,8 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
 	TSubclassOf<UMainWidget> MainUIFactory;
+
 public:
-		
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
@@ -63,9 +61,6 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-
-
-
 
 protected:
 	// APawn interface
@@ -84,8 +79,4 @@ public:
 	UTP_WeaponComponent* TP_WeaponComponent;
 
 private:
-		
-
-
 };
-

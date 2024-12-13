@@ -8,9 +8,8 @@
 // Sets default values
 AMinoSpawner::AMinoSpawner()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -23,12 +22,10 @@ void AMinoSpawner::BeginPlay()
 void AMinoSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AMinoSpawner::SpawnAndMoveMino() const
 {
-	
 	// MinoToSpawn가 nullptr인지 확인합니다. 스폰할 미노의 클래스가 설정되어 있는 경우에만 작업을 계속합니다.
 	if (MinoToSpawn != nullptr)
 	{
@@ -41,7 +38,7 @@ void AMinoSpawner::SpawnAndMoveMino() const
 		성공적으로 스폰되면 SpawnedMino 변수에 스폰된 객체가 저장됩니다.*/
 		AMino* SpawnedMino = GetWorld()->SpawnActor<AMino>(MinoToSpawn, SpawnLocation, SpawnRotation);
 
-		 
+
 		if (SpawnedMino)
 		{
 			//스폰된 미노의 루트 컴포넌트를 UPrimitiveComponent로 캐스팅합니다. UPrimitiveComponent는
@@ -55,7 +52,6 @@ void AMinoSpawner::SpawnAndMoveMino() const
 				RootPrimitiveComponent->SetPhysicsLinearVelocity(Velocity);
 			}
 		}
-
 	}
 }
 
@@ -66,4 +62,3 @@ FRotator AMinoSpawner::GetRandom90DegreeRotation()
 	const int32 RandomRoll = FMath::RandRange(0, 3) * 90;
 	return FRotator(RandomPitch, RandomYaw, RandomRoll);
 }
-

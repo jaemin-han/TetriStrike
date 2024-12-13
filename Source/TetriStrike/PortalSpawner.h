@@ -12,8 +12,8 @@ UCLASS()
 class TETRISTRIKE_API APortalSpawner : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	APortalSpawner();
 
@@ -21,7 +21,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bShouldCreatePortal;
 

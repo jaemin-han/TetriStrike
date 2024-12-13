@@ -27,10 +27,12 @@ UTP_WeaponComponent::UTP_WeaponComponent()
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 	PrimaryComponentTick.bCanEverTick = true;
-	static ConstructorHelpers::FClassFinder<ATetriStrikeProjectile>ProjectileBPClass(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonProjectile"));
+	static ConstructorHelpers::FClassFinder<ATetriStrikeProjectile> ProjectileBPClass(
+		TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonProjectile"));
 	ProjectileClass = ProjectileBPClass.Class;
 
-	static ConstructorHelpers::FClassFinder<ATetriStrikeReverseProjectile>ReverseProjectileBPClass(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonProjectileReverse"));
+	static ConstructorHelpers::FClassFinder<ATetriStrikeReverseProjectile> ReverseProjectileBPClass(
+		TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonProjectileReverse"));
 	ReverseProjectileClass = ReverseProjectileBPClass.Class;
 	//BulletDamage = 1.0f;
 }
@@ -58,7 +60,8 @@ void UTP_WeaponComponent::Fire()
 
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
-			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+			ActorSpawnParams.SpawnCollisionHandlingOverride =
+				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 			// Try and play the sound if specified
 			if (bIsPortalGun)
@@ -90,7 +93,8 @@ void UTP_WeaponComponent::Fire()
 			//Check Portal Function and Spawn Portal Projectile
 			if (bIsPortalGun)
 			{
-				APortalProjectile* PortalProjectile = World->SpawnActor<APortalProjectile>(PortalProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				APortalProjectile* PortalProjectile = World->SpawnActor<APortalProjectile>(
+					PortalProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 				if (PortalProjectile)
 				{
 					PortalLocation = PortalProjectile->PortalLocation;
@@ -105,7 +109,8 @@ void UTP_WeaponComponent::Fire()
 			}
 
 			// Spawn the projectile at the muzzle
-			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(
+				ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			if (Projectile)
 			{
@@ -125,8 +130,8 @@ void UTP_WeaponComponent::ReverseFire()
 	{
 		return;
 	}
-	
-	
+
+
 	// Try and fire a projectile
 	if (ReverseProjectileClass != nullptr)
 	{
@@ -139,23 +144,24 @@ void UTP_WeaponComponent::ReverseFire()
 
 			//bug temp
 			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
-	
+
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
-			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-			
+			ActorSpawnParams.SpawnCollisionHandlingOverride =
+				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
 			// Spawn the projectile at the muzzle
 			//TSubclassOf<ATetriStrikeProjectile> ReverseProjectileClass = ATetriStrikeReverseProjectile::StaticClass();
-			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(ReverseProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			ATetriStrikeProjectile* Projectile = World->SpawnActor<ATetriStrikeProjectile>(
+				ReverseProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			//World->SpawnActor<ATetriStrikeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			if(Projectile)
+			if (Projectile)
 			{
 				Projectile->SetDamage(UTP_WeaponComponent::BulletDamage);
 				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
 				Projectile->SetActorRotation(SpawnRotation);
 			}
 			bIncreaseStart = false;
-
 		}
 	}
 	UTP_WeaponComponent::BulletDamage = 1.0f;
@@ -165,7 +171,7 @@ void UTP_WeaponComponent::ReverseFire()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
 	}
-	
+
 	// Try and play a firing animation if specified
 	if (FireAnimation != nullptr)
 	{
@@ -176,7 +182,6 @@ void UTP_WeaponComponent::ReverseFire()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
-	
 }
 
 
@@ -200,26 +205,33 @@ bool UTP_WeaponComponent::AttachWeapon(ATetriStrikeCharacter* TargetCharacter)
 	// Set up action bindings
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			// Set the priority of the mapping to 1, so that it overrides the Jump action with the Fire action when using touch input
 			Subsystem->AddMappingContext(FireMappingContext, 1);
 		}
 
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(
+			PlayerController->InputComponent))
 		{
 			// Fire
 			//EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::Fire);
 
 			//EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UTP_WeaponComponent::OnFireTriggered);
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::OnFireOngoing);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Ongoing, this,
+			                                   &UTP_WeaponComponent::OnFireOngoing);
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &UTP_WeaponComponent::Fire);
 
-			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Ongoing, this, &UTP_WeaponComponent::OnReverseFireOngoing);
-			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Completed, this, &UTP_WeaponComponent::ReverseFire);
+			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Ongoing, this,
+			                                   &UTP_WeaponComponent::OnReverseFireOngoing);
+			EnhancedInputComponent->BindAction(ReverseFireAction, ETriggerEvent::Completed, this,
+			                                   &UTP_WeaponComponent::ReverseFire);
 
-			EnhancedInputComponent->BindAction(ToggleGun, ETriggerEvent::Started, this, &UTP_WeaponComponent::ToggleGunFunction);
-			EnhancedInputComponent->BindAction(DestroyPortal, ETriggerEvent::Started, this, &UTP_WeaponComponent::PortalSeekAndDestroy);
+			EnhancedInputComponent->BindAction(ToggleGun, ETriggerEvent::Started, this,
+			                                   &UTP_WeaponComponent::ToggleGunFunction);
+			EnhancedInputComponent->BindAction(DestroyPortal, ETriggerEvent::Started, this,
+			                                   &UTP_WeaponComponent::PortalSeekAndDestroy);
 		}
 	}
 
@@ -237,7 +249,8 @@ void UTP_WeaponComponent::SpawnPortal()
 	ATetriStrikeGameMode* gm = Cast<ATetriStrikeGameMode>(GetWorld()->GetAuthGameMode());
 	if (gm->bTransformCheck)
 	{
-		APortalSpawner* PortalSpawn = GetWorld()->SpawnActor<APortalSpawner>(PortalSpawnFactory, gm->PortalLocation, gm->PortalRotation);
+		APortalSpawner* PortalSpawn = GetWorld()->SpawnActor<APortalSpawner>(
+			PortalSpawnFactory, gm->PortalLocation, gm->PortalRotation);
 	}
 	else
 	{
@@ -265,7 +278,6 @@ void UTP_WeaponComponent::PortalSeekAndDestroy()
 	{
 		gm->PortalCount = 0;
 	}
-
 }
 
 
@@ -300,38 +312,38 @@ void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->RemoveMappingContext(FireMappingContext);
 		}
 	}
 }
 
-void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UTP_WeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                        FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if(bIncreaseStart)
+	if (bIncreaseStart)
 	{
 		IncreasePower();
 	}
 }
+
 void UTP_WeaponComponent::SetMainUI(UMainWidget* InMainUI)
 {
 	MainUI = InMainUI;
 }
+
 void UTP_WeaponComponent::IncreasePower()
 {
-	
-	if(UTP_WeaponComponent::BulletDamage < 100)
+	if (UTP_WeaponComponent::BulletDamage < 100)
 	{
-		UTP_WeaponComponent::BulletDamage += 50.0f * GetWorld()->GetDeltaSeconds();
+		UTP_WeaponComponent::BulletDamage += IncreasePowerMultiplier * GetWorld()->GetDeltaSeconds();
 		UE_LOG(LogTemp, Warning, TEXT("Bulletdamage---- updated: %f"), UTP_WeaponComponent::BulletDamage);
-		
-
 	}
 	else
 	{
 		UTP_WeaponComponent::BulletDamage = 100.0f;
 	}
-	
 }

@@ -18,14 +18,14 @@ class ATetriStrikeProjectile : public AActor
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	USphereComponent* CollisionComp;
 
-
 public:
 	ATetriStrikeProjectile();
 
 
 	/** called when projectile hits something */
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse,
+	           const FHitResult& Hit);
 
 	/** Returns CollisionComp subobject **/
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
@@ -37,22 +37,17 @@ public:
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
-	
+
 protected:
 	virtual void BeginPlay() override;
-public:
 
-	
+public:
 	void SetDamage(float DamageAmount);
 	void CalculateVelocity();
-	float VelocityMultiplier = 150.0f;
 	float VelocityMinimum = 300.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Multiplier)
 	float ImpulseMultiplier = 700.0f;
 	int32 ReverseMaker = 1;
 
-
-	
 private:
-
 };
-
