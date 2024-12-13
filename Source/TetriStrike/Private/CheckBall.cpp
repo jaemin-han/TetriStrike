@@ -52,17 +52,12 @@ void ACheckBall::ModifyDensity(int32 Index, bool bIsOverlap)
 {
 	if (bIsOverlap)
 	{
-		DensityArray[Index]++;
+		++DensityArray[Index];
 		if (DensityArray[Index] > Threshold)
-		{
 			AClearZone::ClearArray[Index]->SliceAndDestroy();
-			// GameMode->ClearArray[Index]->SliceAndDestroy();
-		}
 	}
 	else
-	{
-		DensityArray[Index]--;
-	}
+		--DensityArray[Index];
 }
 
 void ACheckBall::DebugDensity()
